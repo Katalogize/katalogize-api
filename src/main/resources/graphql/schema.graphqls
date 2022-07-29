@@ -1,0 +1,17 @@
+type Query {
+    catalogById(id: ID): Catalog
+}
+
+type Catalog {
+    id: ID
+    name: String
+    description: String
+    user: User
+}
+
+type User {
+    id: ID
+    firstName: String
+    lastName: String
+    email: String
+}
