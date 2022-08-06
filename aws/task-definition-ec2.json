@@ -9,14 +9,14 @@
       "entryPoint": null,
       "portMappings": [
         {
-          "hostPort": 8080,
+          "hostPort": 0,
           "protocol": "tcp",
           "containerPort": 8080
         }
       ],
       "command": null,
       "linuxParameters": null,
-      "cpu": 0,
+      "cpu": 256,
       "environment": [],
       "resourceRequirements": null,
       "ulimits": null,
@@ -25,11 +25,11 @@
       "workingDirectory": null,
       "secrets": null,
       "dockerSecurityOptions": null,
-      "memory": 512,
-      "memoryReservation": null,
+      "memory": null,
+      "memoryReservation": 512,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "134017077754.dkr.ecr.us-east-1.amazonaws.com/katalogize:65cb84225f9317adf2baa992ba68d6623042afc7",
+      "image": "134017077754.dkr.ecr.us-east-1.amazonaws.com/katalogize:9aa03dd0aea93f01040a329e0061cea41195ddcf",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -50,20 +50,32 @@
     }
   ],
   "placementConstraints": [],
-  "memory": null,
-  "taskRoleArn": null,
+  "memory": "512",
+  "taskRoleArn": "arn:aws:iam::134017077754:role/ecsTaskExecutionRole",
   "compatibilities": [
     "EXTERNAL",
     "EC2"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:134017077754:task-definition/katalogize-task-ec2:1",
-  "family": "katalogize-task-ec2",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:134017077754:task-definition/task-definition-ec2-2:1",
+  "family": "task-definition-ec2-2",
   "requiresAttributes": [
     {
       "targetId": null,
       "targetType": null,
       "value": null,
       "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
     },
     {
       "targetId": null,
@@ -78,7 +90,7 @@
   ],
   "networkMode": null,
   "runtimePlatform": null,
-  "cpu": null,
+  "cpu": "256",
   "revision": 1,
   "status": "ACTIVE",
   "inferenceAccelerators": null,
