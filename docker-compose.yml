@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+    katalogize-api:
+      container_name: katalogize-api
+      restart: always
+      build: ./
+      ports:
+        - "8080:8080"

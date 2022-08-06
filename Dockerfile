@@ -1,8 +1,9 @@
 FROM openjdk:18-alpine
 MAINTAINER Joao Moraes
-WORKDIR /katalogize-api
+WORKDIR /usr/app
 ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} /katalogize-api/app.jar
+COPY ${JAR_FILE} /usr/app/app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 #./gradlew bootJar
