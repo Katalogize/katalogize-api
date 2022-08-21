@@ -6,3 +6,13 @@ services:
       build: ./
       ports:
         - "8080:8080"
+      links:
+        - mongo_db
+    mongo_db:
+      container_name: mongo
+      restart: always
+      image: mongo
+      volumes:
+        - ./data:/data/db
+      ports:
+        - '27017:27017'

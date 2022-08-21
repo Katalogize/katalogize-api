@@ -1,5 +1,10 @@
 type Query {
-    catalogById(id: ID): Catalog
+    getAllCatalogs: [Catalog]
+    getCatalogById(id: ID): Catalog
+    getAllCatalogsByUserId(id: ID): [Catalog]
+
+    getAllUsers: [User]
+    getUserById(id: ID): User
 }
 
 type Catalog {
