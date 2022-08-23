@@ -1,7 +1,10 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.models.Catalog;
+import com.katalogizegroup.katalogize.models.CatalogItem;
+import com.katalogizegroup.katalogize.models.itemfields.ItemField;
 import com.katalogizegroup.katalogize.models.User;
+import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
@@ -22,6 +25,9 @@ import java.util.Optional;
 public class CatalogController {
     @Autowired
     CatalogRepository catalogRepository;
+
+    @Autowired
+    CatalogItemRepository catalogItemRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -48,7 +54,7 @@ public class CatalogController {
             catalogRepository.deleteById(id);
             return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity<Catalog>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @QueryMapping
@@ -66,9 +72,24 @@ public class CatalogController {
         return catalogRepository.getCatalogsByUserId(id);
     }
 
+    @QueryMapping
+    public List<CatalogItem> getAllCatalogItems() {
+        return catalogItemRepository.findAll();
+    }
+    @QueryMapping
+    public List<CatalogItem> getAllCatalogItemsByCatalogId(@Argument int id) {
+        return catalogRepository.findById(id).get().getItems();
+    }
+
     @SchemaMapping
     public Optional<User> user(Catalog catalog) {
         Optional<User> userEntity = userRepository.findById(catalog.getUserId());
         return userEntity;
+    }
+
+    @SchemaMapping
+    public List<ItemField> fields(CatalogItem catalogItem) {
+        List<ItemField> itemFields = catalogItem.getFields();
+        return itemFields;
     }
 }

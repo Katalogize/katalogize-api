@@ -3,6 +3,9 @@ type Query {
     getCatalogById(id: ID): Catalog
     getAllCatalogsByUserId(id: ID): [Catalog]
 
+    getAllCatalogItems: [CatalogItem]
+    getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
+
     getAllUsers: [User]
     getUserById(id: ID): User
 }
@@ -12,6 +15,24 @@ type Catalog {
     name: String
     description: String
     user: User
+    items: [CatalogItem]
+}
+
+type CatalogItem {
+    id: ID
+    fields: [ItemField]
+}
+
+union ItemField = ItemFieldInt | ItemFieldString
+
+type ItemFieldInt {
+    name: String!
+    value: Int
+}
+
+type ItemFieldString {
+    name: String!
+    value: String
 }
 
 type User {

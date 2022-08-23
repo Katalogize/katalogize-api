@@ -7,6 +7,8 @@ import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +25,25 @@ public class UserController {
     SequenceGeneratorService sequenceGenerator;
 
     @PostMapping("/Add")
-    public User add(@RequestBody User user) {
+    public ResponseEntity<User> add(@RequestBody User user) {
         if (user.getId() == 0) {
             user.setId((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME));
         }
-        User userEntity = userRepository.insert(user);
-        return userEntity;
+        try {
+            User userEntity = userRepository.insert(user);
+            return new ResponseEntity<>(userEntity, HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable("id") int id) {
-        userRepository.deleteById(id);
+    public ResponseEntity deleteById(@PathVariable("id") int id) {
+        if (!userRepository.findById(id).isEmpty()) {
+            userRepository.deleteById(id);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @QueryMapping
