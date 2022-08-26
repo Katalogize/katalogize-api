@@ -4,7 +4,7 @@ type Query {
     getAllCatalogsByUserId(id: ID): [Catalog]
 
     getAllCatalogItems: [CatalogItem]
-    getCatalogItemById(id: ID): Catalog
+    getCatalogItemById(id: ID): CatalogItem
     getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
 
     getAllUsers: [User]
@@ -16,23 +16,27 @@ type Catalog {
     name: String
     description: String
     user: User
+    templates: [CatalogTemplate]
     items: [CatalogItem]
 }
 
 type CatalogItem {
     id: ID
     catalogId: ID
+    templateId: ID
     fields: [ItemField]
 }
 
 union ItemField = ItemFieldInt | ItemFieldString
 
 type ItemFieldInt {
+    order: Int
     name: String!
     value: Int
 }
 
 type ItemFieldString {
+    order: Int
     name: String!
     value: String
 }
@@ -42,4 +46,17 @@ type User {
     firstName: String
     lastName: String
     email: String
+}
+
+type CatalogTemplate {
+    id: ID
+    name: String
+    allowNewFields: Boolean
+    templateFields: [TemplateField]
+}
+
+type TemplateField {
+    order: Int
+    name: String
+    fieldType: Int
 }

@@ -1,15 +1,12 @@
 package com.katalogizegroup.katalogize.models.itemfields;
 
-import com.katalogizegroup.katalogize.utils.FieldTemplateEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public abstract class ItemField {
-    @NonNull private String name;
+    @NonNull private int order;
+    @NonNull private String name = "Field Name";
 }
 

@@ -4,6 +4,8 @@ type Mutation {
 
     createCatalogItem (catalogItem: CatalogItemInput): CatalogItem
     deleteCatalogItem (id: ID): CatalogItem
+
+    createCatalogTemplate(catalogTemplate: CatalogTemplateInput): CatalogTemplate
 }
 
 input CatalogInput {
@@ -11,21 +13,37 @@ input CatalogInput {
     name: String
     description: String
     userId: ID
+    templateIds: [ID]
 }
 
 input CatalogItemInput {
     id: ID
     catalogId: ID,
+    templateId: ID,
     integerFields: [ItemFieldIntInput]
     stringFields: [ItemFieldStringInput]
 }
 
 input ItemFieldIntInput {
+    order: Int
     name: String!
     value: Int
 }
 
 input ItemFieldStringInput {
+    order: Int
     name: String!
     value: String
+}
+
+input CatalogTemplateInput {
+    name: String
+    allowNewFields: Boolean
+    templateFields: [TemplateFieldInput]
+}
+
+input TemplateFieldInput {
+    order: Int
+    name: String
+    fieldType: Int
 }

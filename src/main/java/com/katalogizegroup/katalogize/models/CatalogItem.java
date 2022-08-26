@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document (collection = "catalogitems")
+@Document (collection = "catalog-items")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,7 +21,8 @@ public class CatalogItem {
 
     @NonNull private int catalogId;
 
-    private List<ItemField> fields = new ArrayList<>();
+    @NonNull private int templateId;
+    @NonNull private List<ItemField> fields = new ArrayList<>();
 
     @Transient
     public static final String SEQUENCE_NAME = "catalog_items_sequence";
