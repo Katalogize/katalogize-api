@@ -1,0 +1,31 @@
+type Mutation {
+    createCatalog (catalog: CatalogInput): Catalog
+    deleteCatalog (id: ID): Catalog
+
+    createCatalogItem (catalogItem: CatalogItemInput): CatalogItem
+    deleteCatalogItem (id: ID): CatalogItem
+}
+
+input CatalogInput {
+    id: ID
+    name: String
+    description: String
+    userId: ID
+}
+
+input CatalogItemInput {
+    id: ID
+    catalogId: ID,
+    integerFields: [ItemFieldIntInput]
+    stringFields: [ItemFieldStringInput]
+}
+
+input ItemFieldIntInput {
+    name: String!
+    value: Int
+}
+
+input ItemFieldStringInput {
+    name: String!
+    value: String
+}

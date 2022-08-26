@@ -4,6 +4,7 @@ type Query {
     getAllCatalogsByUserId(id: ID): [Catalog]
 
     getAllCatalogItems: [CatalogItem]
+    getCatalogItemById(id: ID): Catalog
     getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
 
     getAllUsers: [User]
@@ -20,6 +21,7 @@ type Catalog {
 
 type CatalogItem {
     id: ID
+    catalogId: ID
     fields: [ItemField]
 }
 

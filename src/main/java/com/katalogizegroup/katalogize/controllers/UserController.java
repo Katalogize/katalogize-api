@@ -7,6 +7,7 @@ import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,5 +55,11 @@ public class UserController {
     @QueryMapping
     public Optional<User> getUserById(@Argument int id) {
         return  userRepository.findById(id);
+    }
+
+    @SchemaMapping
+    public Optional<User> user(Catalog catalog) {
+        Optional<User> userEntity = userRepository.findById(catalog.getUserId());
+        return userEntity;
     }
 }

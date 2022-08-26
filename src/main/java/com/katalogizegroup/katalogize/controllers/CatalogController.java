@@ -1,19 +1,13 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.models.Catalog;
-import com.katalogizegroup.katalogize.models.CatalogItem;
-import com.katalogizegroup.katalogize.models.itemfields.ItemField;
-import com.katalogizegroup.katalogize.models.User;
-import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
-import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,34 +21,27 @@ public class CatalogController {
     CatalogRepository catalogRepository;
 
     @Autowired
-    CatalogItemRepository catalogItemRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
     SequenceGeneratorService sequenceGenerator;
 
-    @PostMapping("/Add")
-    public ResponseEntity<Catalog> add(@RequestBody Catalog catalog) {
-        if (catalog.getId() == 0) {
-            catalog.setId((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME));
-        }
+    @MutationMapping
+    public Catalog createCatalog(@Argument Catalog catalog) {
+        catalog.setId((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME));
         try {
             Catalog catalogEntity = catalogRepository.insert(catalog);
-            return new ResponseEntity<>(catalogEntity, HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return catalogEntity;
+        } catch (Exception e){
+            throw new GraphQLException("Error while creating the catalog");
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteById(@PathVariable("id") int id) {
-        if (!catalogRepository.findById(id).isEmpty()) {
+    @MutationMapping
+    public Catalog deleteCatalog(@Argument int id) {
+        Optional<Catalog> catalogEntity = catalogRepository.findById(id);
+        if (!catalogEntity.isEmpty()) {
             catalogRepository.deleteById(id);
-            return new ResponseEntity(HttpStatus.OK);
+            return catalogEntity.get();
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        return null;
     }
 
     @QueryMapping
@@ -70,26 +57,5 @@ public class CatalogController {
     @QueryMapping
     public List<Catalog> getAllCatalogsByUserId(@Argument int id) {
         return catalogRepository.getCatalogsByUserId(id);
-    }
-
-    @QueryMapping
-    public List<CatalogItem> getAllCatalogItems() {
-        return catalogItemRepository.findAll();
-    }
-    @QueryMapping
-    public List<CatalogItem> getAllCatalogItemsByCatalogId(@Argument int id) {
-        return catalogRepository.findById(id).get().getItems();
-    }
-
-    @SchemaMapping
-    public Optional<User> user(Catalog catalog) {
-        Optional<User> userEntity = userRepository.findById(catalog.getUserId());
-        return userEntity;
-    }
-
-    @SchemaMapping
-    public List<ItemField> fields(CatalogItem catalogItem) {
-        List<ItemField> itemFields = catalogItem.getFields();
-        return itemFields;
     }
 }

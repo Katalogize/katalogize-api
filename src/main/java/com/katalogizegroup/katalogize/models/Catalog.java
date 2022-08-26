@@ -18,7 +18,6 @@ public class Catalog {
     @NonNull private String name;
     @NonNull private String description;
     @NonNull private int userId;
-    private List<CatalogItem> items;
 
     @Transient
     public static final String SEQUENCE_NAME = "catalogs_sequence";

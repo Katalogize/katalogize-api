@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@EnableMongoRepositories(basePackageClasses = {CatalogRepository.class, UserRepository.class})
+@EnableMongoRepositories(basePackageClasses = {CatalogRepository.class, CatalogItemRepository.class, UserRepository.class})
 @Configuration
 public class MongoConfig {
     @Autowired
@@ -34,8 +34,8 @@ public class MongoConfig {
                 catalogRepository.insert(new Catalog((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME), "Catalog Mock 1", "Games played", 1));
                 catalogRepository.insert(new Catalog((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME), "Catalog Mock 2", "Music listened", 1));
                 catalogRepository.insert(new Catalog((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME), "Catalog Mock 3", "Movies watched", 2));
-                catalogItemRepository.insert(new CatalogItem((int)sequenceGenerator.generateSequence(CatalogItem.SEQUENCE_NAME), new ArrayList<>(Arrays.asList(new ItemFieldInt("stars", 9)))));
-                catalogItemRepository.insert(new CatalogItem((int)sequenceGenerator.generateSequence(CatalogItem.SEQUENCE_NAME), new ArrayList<>(Arrays.asList(new ItemFieldString("description", "This is a description"), new ItemFieldInt("rate", 5)))));
+                catalogItemRepository.insert(new CatalogItem((int)sequenceGenerator.generateSequence(CatalogItem.SEQUENCE_NAME), 1, new ArrayList<>(Arrays.asList(new ItemFieldInt("stars", 9)))));
+                catalogItemRepository.insert(new CatalogItem((int)sequenceGenerator.generateSequence(CatalogItem.SEQUENCE_NAME), 1, new ArrayList<>(Arrays.asList(new ItemFieldString("description", "This is a description"), new ItemFieldInt("rate", 5)))));
             };
         }
         return null;
