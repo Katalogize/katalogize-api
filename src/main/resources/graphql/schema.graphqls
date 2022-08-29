@@ -7,6 +7,8 @@ type Query {
     getCatalogItemById(id: ID): CatalogItem
     getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
 
+    getAllCatalogTemplates: [CatalogTemplate]
+
     getAllUsers: [User]
     getUserById(id: ID): User
 }

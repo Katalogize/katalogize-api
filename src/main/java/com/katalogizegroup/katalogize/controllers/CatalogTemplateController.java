@@ -41,6 +41,7 @@ public class CatalogTemplateController {
 
     @MutationMapping
     public CatalogTemplate deleteCatalogTemplate(@Argument int id) {
+        //TODO: Dont delete if template is associated with a catalog;
         Optional<CatalogTemplate> catalogTemplateEntity = catalogTemplateRepository.findById(id);
         if (!catalogTemplateEntity.isEmpty()) {
             catalogTemplateRepository.deleteById(id);

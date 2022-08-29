@@ -1,11 +1,14 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.models.Catalog;
+import com.katalogizegroup.katalogize.models.CatalogTemplate;
 import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpStatus;
@@ -25,26 +28,25 @@ public class UserController {
     @Autowired
     SequenceGeneratorService sequenceGenerator;
 
-    @PostMapping("/Add")
-    public ResponseEntity<User> add(@RequestBody User user) {
-        if (user.getId() == 0) {
-            user.setId((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME));
-        }
+    @MutationMapping
+    public User createUser(@Argument User user) {
+        user.setId((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME));
         try {
             User userEntity = userRepository.insert(user);
-            return new ResponseEntity<>(userEntity, HttpStatus.OK);
+            return userEntity;
         }catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new GraphQLException("Error while creating user");
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteById(@PathVariable("id") int id) {
-        if (!userRepository.findById(id).isEmpty()) {
+    @MutationMapping
+    public User deleteUser(@Argument int id) {
+        Optional<User> userEntity = userRepository.findById(id);
+        if (!userEntity.isEmpty()) {
             userRepository.deleteById(id);
-            return new ResponseEntity(HttpStatus.OK);
+            return userEntity.get();
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        throw  new GraphQLException("User does not exist");
     }
 
     @QueryMapping

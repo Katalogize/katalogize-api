@@ -6,6 +6,10 @@ type Mutation {
     deleteCatalogItem (id: ID): CatalogItem
 
     createCatalogTemplate(catalogTemplate: CatalogTemplateInput): CatalogTemplate
+    deleteCatalogTemplate(id: ID): CatalogTemplate
+
+    createUser (user: UserInput): User
+    deleteUser (id: ID): User
 }
 
 input CatalogInput {
@@ -46,4 +50,11 @@ input TemplateFieldInput {
     order: Int
     name: String
     fieldType: Int
+}
+
+input UserInput {
+    id: ID
+    firstName: String
+    lastName: String
+    email: String
 }
