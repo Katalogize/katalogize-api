@@ -1,0 +1,43 @@
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: katalogize-config
+#data:
+#  host: katalogize-api
+#  database: katalogize-mongodb
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katalogize-api
+  labels:
+    app: katalogize-api
+spec:
+  selector:
+    matchLabels:
+      app: katalogize-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: katalogize-api
+    spec:
+      containers:
+        - name: katalogize-api
+          image: us.gcr.io/katalogize/spring-katalogize:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: katalogize-api
+spec:
+  selector:
+    app: katalogize-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+  type: LoadBalancer

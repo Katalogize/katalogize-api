@@ -7,8 +7,8 @@ services:
       ports:
         - "8080:8080"
       links:
-        - mongo_db
-    mongo_db:
+        - mongo-db
+    mongo-db:
       container_name: mongo
       restart: always
       image: mongo
