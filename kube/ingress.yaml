@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: katalogize-api-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: katalogize-static-ip
+    networking.gke.io/managed-certificates: managed-cert-katalogize
+    kubernetes.io/ingress.class: "gce"
+spec:
+  defaultBackend:
+    service:
+      name: katalogize-api
+      port:
+        number: 80

@@ -26,6 +26,11 @@ spec:
         - name: katalogize-api
           image: us.gcr.io/katalogize/spring-katalogize:latest
           imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health
+            initialDelaySeconds: 10
           ports:
             - containerPort: 8080
 ---
@@ -40,4 +45,4 @@ spec:
     - port: 80
       targetPort: 8080
       protocol: TCP
-  type: LoadBalancer
+  type: NodePort
