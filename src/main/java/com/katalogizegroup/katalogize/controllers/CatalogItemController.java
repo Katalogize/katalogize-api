@@ -14,6 +14,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -37,6 +38,7 @@ public class CatalogItemController {
     SequenceGeneratorService sequenceGenerator;
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
     public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
@@ -109,6 +111,7 @@ public class CatalogItemController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
     public CatalogItem deleteCatalogItem(@Argument int id) {
         Optional<CatalogItem> catalogItemEntity = catalogItemRepository.findById(id);
         if (!catalogItemEntity.isEmpty()) {

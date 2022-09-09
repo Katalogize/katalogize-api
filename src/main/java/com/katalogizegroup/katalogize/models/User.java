@@ -17,6 +17,8 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
+    private Boolean emailVerified = false;
+    private String password = null;
 
     @Transient
     public static final String SEQUENCE_NAME = "users_sequence";

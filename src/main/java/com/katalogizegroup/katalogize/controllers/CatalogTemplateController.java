@@ -11,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -29,6 +30,7 @@ public class CatalogTemplateController {
     SequenceGeneratorService sequenceGenerator;
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
     public CatalogTemplate createCatalogTemplate(@Argument CatalogTemplate catalogTemplate) {
         catalogTemplate.setId((int)sequenceGenerator.generateSequence(CatalogTemplate.SEQUENCE_NAME));
         try {
@@ -40,6 +42,7 @@ public class CatalogTemplateController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
     public CatalogTemplate deleteCatalogTemplate(@Argument int id) {
         //TODO: Dont delete if template is associated with a catalog;
         Optional<CatalogTemplate> catalogTemplateEntity = catalogTemplateRepository.findById(id);
@@ -63,8 +66,10 @@ public class CatalogTemplateController {
     @SchemaMapping
     public List<CatalogTemplate> templates(Catalog catalog) {
         List <CatalogTemplate> templates = new ArrayList<>();
-        for(CatalogTemplate template : catalogTemplateRepository.findAllById(catalog.getTemplateIds())){
-            templates.add(template);
+        if (catalog.getTemplateIds() != null) {
+            for(CatalogTemplate template : catalogTemplateRepository.findAllById(catalog.getTemplateIds())){
+                templates.add(template);
+            }
         }
         return templates;
     }

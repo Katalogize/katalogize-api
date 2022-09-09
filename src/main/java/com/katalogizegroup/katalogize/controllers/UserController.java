@@ -1,5 +1,7 @@
 package com.katalogizegroup.katalogize.controllers;
 
+import com.katalogizegroup.katalogize.config.login.JwtTokenProvider;
+import com.katalogizegroup.katalogize.config.login.SecurityConfig;
 import com.katalogizegroup.katalogize.models.Catalog;
 import com.katalogizegroup.katalogize.models.CatalogTemplate;
 import com.katalogizegroup.katalogize.models.User;
@@ -7,15 +9,24 @@ import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +38,42 @@ public class UserController {
 
     @Autowired
     SequenceGeneratorService sequenceGenerator;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    JwtTokenProvider tokenProvider;
+
+    @MutationMapping
+    public String signIn(@Argument String email, @Argument String password) {
+        Authentication authentication = null;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        } catch (DisabledException e) {
+            throw new GraphQLException("User disabled");
+        } catch (BadCredentialsException e) {
+            throw new GraphQLException("Invalid Credentials");
+        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = tokenProvider.createToken(authentication);
+        return jwt;
+    }
+
+    @MutationMapping
+    public String signUp(@Argument String email, @Argument String firstName, @Argument String lastName, @Argument String password) {
+        if (!userRepository.getUserByEmail(email).isEmpty()) {
+            throw new GraphQLException("Email already exist!");
+        }
+
+        User user = new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), firstName, lastName, email, false, passwordEncoder.encode(password));
+        User userEntity = userRepository.insert(user);
+
+        return "User registered successfully";
+    }
 
     @MutationMapping
     public User createUser(@Argument User user) {

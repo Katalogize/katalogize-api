@@ -28,8 +28,8 @@ public class MongoConfig {
     CommandLineRunner commandLineRunner(CatalogRepository catalogRepository, CatalogItemRepository catalogItemRepository, UserRepository userRepository, CatalogTemplateRepository templateRepository) {
         if (catalogRepository.findAll().size() == 0 && userRepository.findAll().size() == 0) {
             return strings -> {
-                userRepository.insert(new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), "User1", "Mock1", "katalogize@email.com"));
-                userRepository.insert(new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), "User2", "Mock2", "katalogize2@email.com"));
+                userRepository.insert(new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), "User1", "Mock1", "katalogize@email.com", false, null));
+                userRepository.insert(new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), "User2", "Mock2", "katalogize2@email.com", false, null));
                 templateRepository.insert(new CatalogTemplate(0, "Default template", Arrays.asList(), true));
                 int templateId = (int)sequenceGenerator.generateSequence(CatalogTemplate.SEQUENCE_NAME);
                 templateRepository.insert(new CatalogTemplate(templateId, "Movies template", Arrays.asList(new TemplateField(1, "Name", 2), new TemplateField(2, "Stars", 1)), false));
