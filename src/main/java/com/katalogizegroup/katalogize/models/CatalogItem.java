@@ -2,6 +2,7 @@ package com.katalogizegroup.katalogize.models;
 
 import com.katalogizegroup.katalogize.models.itemfields.ItemField;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,23 +10,21 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @Document (collection = "catalog-items")
-@Getter
-@Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
-@NoArgsConstructor
 public class CatalogItem {
     @Id
-    @NonNull private int id;
+    private String id = new ObjectId().toString();
 
-    @NonNull private int catalogId;
+    @NonNull private String catalogId;
 
-    @NonNull private int templateId;
-    @NonNull private List<ItemField> fields = new ArrayList<>();
+    @NonNull private String templateId;
 
-    @Transient
-    public static final String SEQUENCE_NAME = "catalog_items_sequence";
+    @NonNull private String name;
+    @NonNull private List<ItemField> fields;
+
+//    @Transient
+//    public static final String SEQUENCE_NAME = "catalog_items_sequence";
 
     public void addField (ItemField field) {
         fields.add(field);

@@ -32,7 +32,6 @@ public class CatalogTemplateController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogTemplate createCatalogTemplate(@Argument CatalogTemplate catalogTemplate) {
-        catalogTemplate.setId((int)sequenceGenerator.generateSequence(CatalogTemplate.SEQUENCE_NAME));
         try {
             CatalogTemplate catalogTemplateEntity = catalogTemplateRepository.insert(catalogTemplate);
             return catalogTemplateEntity;
@@ -43,7 +42,7 @@ public class CatalogTemplateController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public CatalogTemplate deleteCatalogTemplate(@Argument int id) {
+    public CatalogTemplate deleteCatalogTemplate(@Argument String id) {
         //TODO: Dont delete if template is associated with a catalog;
         Optional<CatalogTemplate> catalogTemplateEntity = catalogTemplateRepository.findById(id);
         if (!catalogTemplateEntity.isEmpty()) {
@@ -59,7 +58,7 @@ public class CatalogTemplateController {
     }
 
     @QueryMapping
-    public Optional<CatalogTemplate> getCatalogTemplateById(@Argument int id) {
+    public Optional<CatalogTemplate> getCatalogTemplateById(@Argument String id) {
         return  catalogTemplateRepository.findById(id);
     }
 

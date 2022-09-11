@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class CatalogItemController {
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
         //Map fields by template
         if (!catalog.isEmpty() && !template.isEmpty() && catalog.get().getTemplateIds().contains(catalogItem.getTemplateId())) {
-            CatalogItem createdCatalogItem = new CatalogItem(0, catalogItem.getCatalogId(), catalogItem.getTemplateId());
+            CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), Arrays.asList());
 
             //Ensure all template fields are present
             for(TemplateField templateField : template.get().getTemplateFields()) {
@@ -102,7 +103,6 @@ public class CatalogItemController {
             }
 
             //Create and save catalog
-            createdCatalogItem.setId((int)sequenceGenerator.generateSequence(CatalogItem.SEQUENCE_NAME));
             CatalogItem catalogItemEntity = catalogItemRepository.insert(createdCatalogItem);
             return catalogItemEntity;
         } else {
@@ -112,7 +112,7 @@ public class CatalogItemController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public CatalogItem deleteCatalogItem(@Argument int id) {
+    public CatalogItem deleteCatalogItem(@Argument String id) {
         Optional<CatalogItem> catalogItemEntity = catalogItemRepository.findById(id);
         if (!catalogItemEntity.isEmpty()) {
             catalogItemRepository.deleteById(id);
@@ -127,12 +127,12 @@ public class CatalogItemController {
     }
 
     @QueryMapping
-    public Optional<CatalogItem> getCatalogItemById(@Argument int id) {
+    public Optional<CatalogItem> getCatalogItemById(@Argument String id) {
         return  catalogItemRepository.findById(id);
     }
 
     @QueryMapping
-    public List<CatalogItem> getAllCatalogItemsByCatalogId(@Argument int id) {
+    public List<CatalogItem> getAllCatalogItemsByCatalogId(@Argument String id) {
         return catalogItemRepository.getCatalogItemsByCatalogId(id);
     }
 

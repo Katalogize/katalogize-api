@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.repository.*;
 
 import java.util.List;
 
-public interface CatalogRepository extends MongoRepository<Catalog, Integer> {
+public interface CatalogRepository extends MongoRepository<Catalog, String> {
     @Query("{userId : ?0}")
-    List<Catalog> getCatalogsByUserId(int id);
+    List<Catalog> getCatalogsByUserId(String id);
 }

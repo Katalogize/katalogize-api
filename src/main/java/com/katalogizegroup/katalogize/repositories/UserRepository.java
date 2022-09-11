@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.*;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends MongoRepository<User, Integer> {
+public interface UserRepository extends MongoRepository<User, String> {
     @Query("{email : ?0}")
     Optional<User> getUserByEmail(String email);
 

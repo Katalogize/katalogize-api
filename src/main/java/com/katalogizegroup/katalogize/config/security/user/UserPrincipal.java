@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 
 public class UserPrincipal implements UserDetails {
-    private int id;
+    private String id;
     private String username;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -36,7 +36,7 @@ public class UserPrincipal implements UserDetails {
         );
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface CatalogTemplateRepository extends MongoRepository<CatalogTemplate, Integer> {
+public interface CatalogTemplateRepository extends MongoRepository<CatalogTemplate, String> {
 }

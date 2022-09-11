@@ -1,26 +1,23 @@
 package com.katalogizegroup.katalogize.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
 @Document(collection = "users")
-@Getter
-@Setter
-@AllArgsConstructor
 public class User {
     @Id
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private Boolean emailVerified = false;
-    private String username;
-    private String password = null;
+    private String id = new ObjectId().toString();
+    @NonNull private String firstName;
+    @NonNull private String lastName;
+    @NonNull private String email;
+    @NonNull private Boolean emailVerified;
+    @NonNull private String username;
+    @NonNull private String password;
 
-    @Transient
-    public static final String SEQUENCE_NAME = "users_sequence";
+//    @Transient
+//    public static final String SEQUENCE_NAME = "users_sequence";
 }

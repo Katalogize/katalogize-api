@@ -27,7 +27,6 @@ public class CatalogController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public Catalog createCatalog(@Argument Catalog catalog) {
-        catalog.setId((int)sequenceGenerator.generateSequence(Catalog.SEQUENCE_NAME));
         try {
             Catalog catalogEntity = catalogRepository.insert(catalog);
             return catalogEntity;
@@ -38,7 +37,7 @@ public class CatalogController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public Catalog deleteCatalog(@Argument int id) {
+    public Catalog deleteCatalog(@Argument String id) {
         Optional<Catalog> catalogEntity = catalogRepository.findById(id);
         if (!catalogEntity.isEmpty()) {
             catalogRepository.deleteById(id);
@@ -53,12 +52,12 @@ public class CatalogController {
     }
 
     @QueryMapping
-    public Optional<Catalog> getCatalogById(@Argument int id) {
+    public Optional<Catalog> getCatalogById(@Argument String id) {
         return  catalogRepository.findById(id);
     }
 
     @QueryMapping
-    public List<Catalog> getAllCatalogsByUserId(@Argument int id) {
+    public List<Catalog> getAllCatalogsByUserId(@Argument String id) {
         return catalogRepository.getCatalogsByUserId(id);
     }
 }

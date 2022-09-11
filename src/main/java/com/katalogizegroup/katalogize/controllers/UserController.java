@@ -67,7 +67,7 @@ public class UserController {
             throw new GraphQLException("Username already exist!");
         }
 
-        User user = new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), firstName, lastName, email, false, username, passwordEncoder.encode(password));
+        User user = new User(firstName, lastName, email, false, username, passwordEncoder.encode(password));
         User userEntity = userRepository.insert(user);
 
         return "User registered successfully";
@@ -75,7 +75,6 @@ public class UserController {
 
     @MutationMapping
     public User createUser(@Argument User user) {
-        user.setId((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME));
         try {
             User userEntity = userRepository.insert(user);
             return userEntity;
@@ -85,7 +84,7 @@ public class UserController {
     }
 
     @MutationMapping
-    public User deleteUser(@Argument int id) {
+    public User deleteUser(@Argument String id) {
         Optional<User> userEntity = userRepository.findById(id);
         if (!userEntity.isEmpty()) {
             userRepository.deleteById(id);
@@ -100,7 +99,7 @@ public class UserController {
     }
 
     @QueryMapping
-    public Optional<User> getUserById(@Argument int id) {
+    public Optional<User> getUserById(@Argument String id) {
         return  userRepository.findById(id);
     }
 

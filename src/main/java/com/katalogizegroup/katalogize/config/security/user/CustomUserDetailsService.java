@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserById(String id) {
-        User user = userRepository.findById(Integer.parseInt(id)).orElseThrow(
+        User user = userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("User not found")
         );
 
