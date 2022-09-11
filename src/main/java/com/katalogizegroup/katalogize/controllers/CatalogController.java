@@ -27,6 +27,7 @@ public class CatalogController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public Catalog createCatalog(@Argument Catalog catalog) {
+        //TODO: Validate User
         try {
             Catalog catalogEntity = catalogRepository.insert(catalog);
             return catalogEntity;

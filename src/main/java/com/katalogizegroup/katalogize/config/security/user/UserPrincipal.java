@@ -18,10 +18,11 @@ public class UserPrincipal implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(String id, String username, String password, String email, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.authorities = authorities;
     }
 
@@ -32,6 +33,7 @@ public class UserPrincipal implements UserDetails {
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
+                user.getEmail(),
                 authorities
         );
     }

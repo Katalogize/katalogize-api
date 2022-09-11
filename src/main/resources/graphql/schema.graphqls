@@ -63,3 +63,12 @@ type TemplateField {
     name: String
     fieldType: Int
 }
+
+type AuthenticationData {
+    accessToken: String
+    refreshToken: String
+    userId: ID
+    username: String
+    email: String
+    roles: [String]
+}

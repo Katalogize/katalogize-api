@@ -11,23 +11,22 @@ type Mutation {
     createUser (user: UserInput): User
     deleteUser (id: ID): User
 
-    signIn(username: String, password: String): String
-    signUp(email: String, firstName:String, lastName: String, username: String, password: String): String
-    logOut: String
+    signIn(username: String, password: String): AuthenticationData
+    signUp(user: UserInput): String
+    refreshToken(refreshToken: String): AuthenticationData
+    logOut(userId: String): String
 }
 
 input CatalogInput {
-    id: ID
-    name: String
+    name: String!
     description: String
-    userId: ID
+    userId: ID!
     templateIds: [ID]
 }
 
 input CatalogItemInput {
-    id: ID
-    catalogId: ID,
-    templateId: ID,
+    catalogId: ID!
+    templateId: ID
     integerFields: [ItemFieldIntInput]
     stringFields: [ItemFieldStringInput]
 }
@@ -57,8 +56,9 @@ input TemplateFieldInput {
 }
 
 input UserInput {
-    id: ID
-    firstName: String
-    lastName: String
-    email: String
+    firstName: String!
+    lastName: String!
+    email: String!
+    username: String!
+    password: String!
 }

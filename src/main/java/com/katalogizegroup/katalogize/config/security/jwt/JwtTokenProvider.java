@@ -17,12 +17,15 @@ public class JwtTokenProvider {
 
     public String createToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        return createTokenFromUserId(userPrincipal.getId());
+    }
 
+    public String createTokenFromUserId(String userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + appConfig.getTokenExpirationMsec());
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getId())
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, appConfig.getTokenSecret())

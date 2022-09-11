@@ -8,14 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
+@Data
 @Document(collection = "refresh-tokens")
-@Getter
-@Setter
-@NoArgsConstructor
 public class RefreshToken {
     @Id
     private String id = new ObjectId().toString();
     @NonNull private String token;
-    @NonNull private int userId;
+    @NonNull private String userId;
     @NonNull private Instant expiryDate;
 }

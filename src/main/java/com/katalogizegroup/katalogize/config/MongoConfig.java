@@ -29,8 +29,8 @@ public class MongoConfig {
         if (catalogRepository.findAll().size() == 0 && userRepository.findAll().size() == 0) {
             return strings -> {
                 List<User> users = Arrays.asList(
-                        new User("User1", "Mock1", "katalogize@email.com", false, "FakeUser1", "FakePassword1"),
-                        new User("User2", "Mock2", "katalogize2@email.com", false, "FakeUser2", "FakePassword2")
+                        new User("User1", "Mock1", "katalogize@email.com", "FakeUser1", "FakePassword1"),
+                        new User("User2", "Mock2", "katalogize2@email.com", "FakeUser2", "FakePassword2")
                 );
 
                 List<CatalogTemplate> templates = Arrays.asList(
@@ -56,9 +56,6 @@ public class MongoConfig {
                 catalogItemRepository.insert(catalogItems);
             };
         }
-        return strings -> {
-            refreshTokenRepository.insert(new RefreshToken());
-        };
-//        return null;
+        return null;
     }
 }

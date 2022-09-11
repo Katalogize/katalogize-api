@@ -14,7 +14,7 @@ public class User {
     @NonNull private String firstName;
     @NonNull private String lastName;
     @NonNull private String email;
-    @NonNull private Boolean emailVerified;
+    private Boolean emailVerified = false;
     @NonNull private String username;
     @NonNull private String password;
 
