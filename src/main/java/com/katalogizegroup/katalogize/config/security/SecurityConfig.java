@@ -1,6 +1,6 @@
-package com.katalogizegroup.katalogize.config.login;
+package com.katalogizegroup.katalogize.config.security;
 
-import com.katalogizegroup.katalogize.config.login.JwtAuthenticationFilter;
+import com.katalogizegroup.katalogize.config.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,21 +1,16 @@
 package com.katalogizegroup.katalogize.controllers;
 
-import com.katalogizegroup.katalogize.config.login.JwtTokenProvider;
-import com.katalogizegroup.katalogize.config.login.SecurityConfig;
+import com.katalogizegroup.katalogize.config.security.jwt.JwtTokenProvider;
 import com.katalogizegroup.katalogize.models.Catalog;
-import com.katalogizegroup.katalogize.models.CatalogTemplate;
 import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,10 +43,10 @@ public class UserController {
     JwtTokenProvider tokenProvider;
 
     @MutationMapping
-    public String signIn(@Argument String email, @Argument String password) {
+    public String signIn(@Argument String username, @Argument String password) {
         Authentication authentication = null;
         try {
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new GraphQLException("User disabled");
         } catch (BadCredentialsException e) {
@@ -64,12 +58,16 @@ public class UserController {
     }
 
     @MutationMapping
-    public String signUp(@Argument String email, @Argument String firstName, @Argument String lastName, @Argument String password) {
+    public String signUp(@Argument String email, @Argument String firstName, @Argument String lastName, @Argument String username, @Argument String password) {
         if (!userRepository.getUserByEmail(email).isEmpty()) {
             throw new GraphQLException("Email already exist!");
         }
 
-        User user = new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), firstName, lastName, email, false, passwordEncoder.encode(password));
+        if (!userRepository.getUserByUsername(username).isEmpty()) {
+            throw new GraphQLException("Username already exist!");
+        }
+
+        User user = new User((int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME), firstName, lastName, email, false, username, passwordEncoder.encode(password));
         User userEntity = userRepository.insert(user);
 
         return "User registered successfully";

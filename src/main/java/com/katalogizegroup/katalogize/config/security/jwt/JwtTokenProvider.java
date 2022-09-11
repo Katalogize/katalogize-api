@@ -1,6 +1,6 @@
-package com.katalogizegroup.katalogize.config.login;
+package com.katalogizegroup.katalogize.config.security.jwt;
 
-import com.katalogizegroup.katalogize.config.login.user.UserPrincipal;
+import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

@@ -1,4 +1,4 @@
-package com.katalogizegroup.katalogize.config.login;
+package com.katalogizegroup.katalogize.config.security.jwt;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

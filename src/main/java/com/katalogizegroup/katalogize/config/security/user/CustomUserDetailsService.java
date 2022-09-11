@@ -1,4 +1,4 @@
-package com.katalogizegroup.katalogize.config.login.user;
+package com.katalogizegroup.katalogize.config.security.user;
 
 import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
@@ -15,11 +15,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserDetails loadUserByUsername(String email)
+    public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
-        Optional<User> user = userRepository.getUserByEmail(email);
+        Optional<User> user = userRepository.getUserByUsername(username);
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email : " + email);
+            throw new UsernameNotFoundException("User not found with username : " + username);
         }
         return UserPrincipal.create(user.get());
     }

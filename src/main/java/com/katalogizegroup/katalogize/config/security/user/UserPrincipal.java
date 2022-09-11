@@ -1,4 +1,4 @@
-package com.katalogizegroup.katalogize.config.login.user;
+package com.katalogizegroup.katalogize.config.security.user;
 
 import com.katalogizegroup.katalogize.models.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,14 +12,15 @@ import java.util.Map;
 
 public class UserPrincipal implements UserDetails {
     private int id;
+    private String username;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(int id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.email = email;
+        this.username = username;
         this.password = password;
         this.authorities = authorities;
     }
@@ -29,7 +30,7 @@ public class UserPrincipal implements UserDetails {
 
         return new UserPrincipal(
                 user.getId(),
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
                 authorities
         );
@@ -50,7 +51,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

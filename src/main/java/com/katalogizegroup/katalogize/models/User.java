@@ -18,6 +18,7 @@ public class User {
     private String lastName;
     private String email;
     private Boolean emailVerified = false;
+    private String username;
     private String password = null;
 
     @Transient

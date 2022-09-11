@@ -11,8 +11,8 @@ type Mutation {
     createUser (user: UserInput): User
     deleteUser (id: ID): User
 
-    signIn(email: String, password: String): String
-    signUp(email: String, firstName:String, lastName: String, password: String): String
+    signIn(username: String, password: String): String
+    signUp(email: String, firstName:String, lastName: String, username: String, password: String): String
     logOut: String
 }
 
