@@ -18,6 +18,7 @@ public class Catalog {
     private String id = new ObjectId().toString();
     @NonNull private String name;
     @NonNull private String description;
+    @NonNull private boolean isPrivate;
     @NonNull private String userId;
     @NonNull private List<String> templateIds;
 

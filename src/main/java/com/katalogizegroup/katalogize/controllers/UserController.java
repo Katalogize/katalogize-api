@@ -85,17 +85,17 @@ public class UserController {
     }
 
     @MutationMapping
-    public String signUp(@Argument String email, @Argument String firstName, @Argument String lastName, @Argument String username, @Argument String password) {
-        if (!userRepository.getUserByEmail(email).isEmpty()) {
+    public String signUp(@Argument User user) {
+        if (!userRepository.getUserByEmail(user.getEmail()).isEmpty()) {
             throw new GraphQLException("Email is already in use!");
         }
 
-        if (!userRepository.getUserByUsername(username).isEmpty()) {
+        if (!userRepository.getUserByUsername(user.getUsername()).isEmpty()) {
             throw new GraphQLException("Username is already taken!");
         }
 
-        User user = new User(firstName, lastName, email, username, passwordEncoder.encode(password));
-        User userEntity = userRepository.insert(user);
+        User userObject = new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), passwordEncoder.encode(user.getPassword()));
+        User userEntity = userRepository.insert(userObject);
 
         return "User registered successfully!";
     }

@@ -19,7 +19,8 @@ type Mutation {
 
 input CatalogInput {
     name: String!
-    description: String
+    description: String!
+    isPrivate: Boolean!
     userId: ID!
     templateIds: [ID]
 }

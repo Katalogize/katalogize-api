@@ -4,6 +4,7 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -11,11 +12,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
     @Id
     private String id = new ObjectId().toString();
+
     @NonNull private String firstName;
+
     @NonNull private String lastName;
+
+    @Indexed(unique = true)
     @NonNull private String email;
+
     private Boolean emailVerified = false;
+
+    @Indexed(unique = true)
     @NonNull private String username;
+
     @NonNull private String password;
 
 //    @Transient

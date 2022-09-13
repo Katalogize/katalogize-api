@@ -39,9 +39,9 @@ public class MongoConfig {
                 );
 
                 List<Catalog> catalogs = Arrays.asList(
-                        new Catalog("Music", "Music listened", new ObjectId(users.get(0).getId()).toString(), Arrays.asList(templates.get(0).getId())),
-                        new Catalog("Games", "Games played", users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
-                        new Catalog("Movies", "Movies watched", users.get(1).getId(), Arrays.asList(templates.get(0).getId()))
+                        new Catalog("Music", "Music listened", true, new ObjectId(users.get(0).getId()).toString(), Arrays.asList(templates.get(0).getId())),
+                        new Catalog("Games", "Games played", true, users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
+                        new Catalog("Movies", "Movies watched", false, users.get(1).getId(), Arrays.asList(templates.get(0).getId()))
                 );
 
                 List<CatalogItem> catalogItems = Arrays.asList(

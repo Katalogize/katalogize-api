@@ -1,5 +1,6 @@
 package com.katalogizegroup.katalogize.controllers;
 
+import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.Catalog;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
@@ -9,6 +10,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +61,14 @@ public class CatalogController {
 
     @QueryMapping
     public List<Catalog> getAllCatalogsByUserId(@Argument String id) {
+        //TODO: Return only public catalogs
         return catalogRepository.getCatalogsByUserId(id);
+    }
+
+    @QueryMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public List<Catalog> getAllCatalogsByLoggedUser() {
+        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return catalogRepository.getCatalogsByUserId(userDetails.getId());
     }
 }

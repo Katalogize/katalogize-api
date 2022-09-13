@@ -2,6 +2,7 @@ type Query {
     getAllCatalogs: [Catalog]
     getCatalogById(id: ID): Catalog
     getAllCatalogsByUserId(id: ID): [Catalog]
+    getAllCatalogsByLoggedUser: [Catalog]
 
     getAllCatalogItems: [CatalogItem]
     getCatalogItemById(id: ID): CatalogItem
