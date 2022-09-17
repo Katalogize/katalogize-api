@@ -143,6 +143,13 @@ public class UserController {
         return  userRepository.findById(id);
     }
 
+    @QueryMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public Optional<User> getLoggedUser() {
+        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findById(userDetails.getId());
+    }
+
     @SchemaMapping
     public Optional<User> user(Catalog catalog) {
         Optional<User> userEntity = userRepository.findById(catalog.getUserId());

@@ -12,6 +12,7 @@ type Query {
 
     getAllUsers: [User]
     getUserById(id: ID): User
+    getLoggedUser: User
 }
 
 type Catalog {
