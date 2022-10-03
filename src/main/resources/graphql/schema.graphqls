@@ -3,6 +3,7 @@ type Query {
     getCatalogById(id: ID): Catalog
     getAllCatalogsByUserId(id: ID): [Catalog]
     getAllCatalogsByLoggedUser: [Catalog]
+    getCatalogsByUsername(username: String): [Catalog]
 
     getAllCatalogItems: [CatalogItem]
     getCatalogItemById(id: ID): CatalogItem
@@ -21,6 +22,7 @@ type Catalog {
     description: String
     user: User
     templates: [CatalogTemplate]
+    isPrivate: Boolean
     items: [CatalogItem]
 }
 

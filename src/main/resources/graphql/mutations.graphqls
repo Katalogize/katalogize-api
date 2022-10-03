@@ -22,7 +22,7 @@ input CatalogInput {
     description: String!
     isPrivate: Boolean!
     userId: ID!
-    templateIds: [ID]
+    templateIds: [ID]!
 }
 
 input CatalogItemInput {
@@ -45,8 +45,8 @@ input ItemFieldStringInput {
 }
 
 input CatalogTemplateInput {
-    name: String
-    allowNewFields: Boolean
+    name: String!
+    allowNewFields: Boolean!
     templateFields: [TemplateFieldInput]
 }
 

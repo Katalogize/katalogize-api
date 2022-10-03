@@ -2,7 +2,9 @@ package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.Catalog;
+import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
+import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class CatalogController {
     CatalogRepository catalogRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     SequenceGeneratorService sequenceGenerator;
 
     @MutationMapping
@@ -31,6 +36,8 @@ public class CatalogController {
     public Catalog createCatalog(@Argument Catalog catalog) {
         //TODO: Validate User
         try {
+            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            catalog.setUserId(userDetails.getId());
             Catalog catalogEntity = catalogRepository.insert(catalog);
             return catalogEntity;
         } catch (Exception e){
@@ -63,6 +70,23 @@ public class CatalogController {
     public List<Catalog> getAllCatalogsByUserId(@Argument String id) {
         //TODO: Return only public catalogs
         return catalogRepository.getCatalogsByUserId(id);
+    }
+
+    @QueryMapping
+    public List<Catalog> getCatalogsByUsername(@Argument String username) {
+        String loggedUsername = "";
+        try {
+            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            loggedUsername = userDetails.getUsername();
+        } finally {
+            Optional<User> user = userRepository.getUserByUsername(username);
+            if (user.isEmpty()) throw new GraphQLException("Invalid user");
+            if (username.equals(loggedUsername)) {
+                return catalogRepository.getCatalogsByUserId(user.get().getId());
+            }else{
+                return catalogRepository.getPublicCatalogsByUsername(user.get().getId());
+            }
+        }
     }
 
     @QueryMapping
