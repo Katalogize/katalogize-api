@@ -7,9 +7,9 @@ type Query {
     getCatalogByUsernameAndCatalogName(username: String, catalogName: String): Catalog
 
     getAllCatalogItems: [CatalogItem]
+    getCatalogItem(username: String, catalogName: String, itemName: String): CatalogItem
     getCatalogItemById(id: ID): CatalogItem
     getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
-    getCatalogItemsByUsernameAndCatalogName(username: String, catalogName: String): [CatalogItem]
 
     getAllCatalogTemplates: [CatalogTemplate]
 
@@ -33,6 +33,7 @@ type CatalogItem {
     name: String
     catalogId: ID
     templateId: ID
+    template: CatalogTemplate
     fields: [ItemField]
 }
 

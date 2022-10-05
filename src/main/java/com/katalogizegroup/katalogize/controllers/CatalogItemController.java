@@ -133,12 +133,14 @@ public class CatalogItemController {
     }
 
     @QueryMapping
-    public List<CatalogItem> getCatalogItemsByUsernameAndCatalogName(@Argument String username, @Argument String catalogName) {
+    public CatalogItem getCatalogItem(@Argument String username, @Argument String catalogName, @Argument String itemName) {
         Optional<User> user = userRepository.getUserByUsername(username);
         if (user.isEmpty()) throw new GraphQLException("Invalid user");
         Catalog catalog = catalogRepository.getCatalogByUserIdAndCatalogName(user.get().getId(), catalogName);
         if (catalog == null) throw new GraphQLException("Invalid catalog");
-        return catalogItemRepository.getCatalogItemsByCatalogId(catalog.getId());
+        CatalogItem catalogItem = catalogItemRepository.getCatalogItemByNameAndCatalogId(itemName, catalog.getId());
+        if (catalogItem == null) throw new GraphQLException("Invalid item");
+        return catalogItem;
     }
 
     @QueryMapping

@@ -72,4 +72,11 @@ public class CatalogTemplateController {
         }
         return templates;
     }
+
+    @SchemaMapping
+    public CatalogTemplate template(CatalogItem catalogItem) {
+        Optional<CatalogTemplate> catalogTemplate = catalogTemplateRepository.findById(catalogItem.getTemplateId());
+        if (catalogTemplate.isEmpty()) throw new GraphQLException("Invalid template");
+        return  catalogTemplate.get();
+    }
 }
