@@ -35,9 +35,16 @@ public class CatalogController {
     @PreAuthorize("hasAuthority('USER')")
     public Catalog createCatalog(@Argument Catalog catalog) {
         //TODO: Validate User
+        UserPrincipal userDetails;
         try {
-            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             catalog.setUserId(userDetails.getId());
+        } catch (Exception e) {
+            throw new GraphQLException("Invalid user");
+        }
+        Catalog catalogExists = catalogRepository.getCatalogByUserIdAndCatalogName(userDetails.getId(), catalog.getName());
+        if (catalogExists != null) throw new GraphQLException("Catalog with this name already exists in this account");
+        try {
             Catalog catalogEntity = catalogRepository.insert(catalog);
             return catalogEntity;
         } catch (Exception e){
@@ -84,7 +91,26 @@ public class CatalogController {
             if (username.equals(loggedUsername)) {
                 return catalogRepository.getCatalogsByUserId(user.get().getId());
             }else{
-                return catalogRepository.getPublicCatalogsByUsername(user.get().getId());
+                return catalogRepository.getPublicCatalogsByUserId(user.get().getId());
+            }
+        }
+    }
+
+    @QueryMapping
+    public Catalog getCatalogByUsernameAndCatalogName(@Argument String username, @Argument String catalogName) {
+        String loggedUsername = "";
+        try {
+            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            loggedUsername = userDetails.getUsername();
+        } finally {
+            Optional<User> user = userRepository.getUserByUsername(username);
+            if (user.isEmpty()) throw new GraphQLException("Invalid user");
+            Catalog catalog = catalogRepository.getCatalogByUserIdAndCatalogName(user.get().getId(), catalogName);
+            if (catalog == null) throw new GraphQLException("Invalid catalog");
+            if ((catalog.isPrivate() && username.equals(loggedUsername)) || !catalog.isPrivate()) {
+                return catalog;
+            }else{
+                throw new GraphQLException("Unauthorized");
             }
         }
     }

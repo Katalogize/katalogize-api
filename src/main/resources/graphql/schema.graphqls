@@ -4,10 +4,12 @@ type Query {
     getAllCatalogsByUserId(id: ID): [Catalog]
     getAllCatalogsByLoggedUser: [Catalog]
     getCatalogsByUsername(username: String): [Catalog]
+    getCatalogByUsernameAndCatalogName(username: String, catalogName: String): Catalog
 
     getAllCatalogItems: [CatalogItem]
     getCatalogItemById(id: ID): CatalogItem
     getAllCatalogItemsByCatalogId(id: ID): [CatalogItem]
+    getCatalogItemsByUsernameAndCatalogName(username: String, catalogName: String): [CatalogItem]
 
     getAllCatalogTemplates: [CatalogTemplate]
 
@@ -28,6 +30,7 @@ type Catalog {
 
 type CatalogItem {
     id: ID
+    name: String
     catalogId: ID
     templateId: ID
     fields: [ItemField]

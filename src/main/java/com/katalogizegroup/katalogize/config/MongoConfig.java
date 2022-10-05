@@ -39,13 +39,14 @@ public class MongoConfig {
                 );
 
                 List<Catalog> catalogs = Arrays.asList(
-                        new Catalog("Music", "Music listened", true, new ObjectId(users.get(0).getId()).toString(), Arrays.asList(templates.get(0).getId())),
-                        new Catalog("Games", "Games played", true, users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
+                        new Catalog("Music", "Music listened", false, new ObjectId(users.get(0).getId()).toString(), Arrays.asList(templates.get(0).getId())),
+                        new Catalog("Games", "Games played", false, users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
                         new Catalog("Movies", "Movies watched", false, users.get(1).getId(), Arrays.asList(templates.get(0).getId()))
                 );
 
                 List<CatalogItem> catalogItems = Arrays.asList(
                         new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Summer Renaissance", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldInt(2, "Likes", 9))),
+                        new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Energy", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldInt(2, "Likes", 9))),
                         new CatalogItem(catalogs.get(1).getId(), templates.get(1).getId(), "It Takes Two", Arrays.asList(new ItemFieldString(1, "", "A coop game"), new ItemFieldInt(2, "", 9))),
                         new CatalogItem(catalogs.get(2).getId(), templates.get(0).getId(), "Gremlins", Arrays.asList(new ItemFieldString(1, "Description", "A gremlins movie"), new ItemFieldInt(2, "Year", 1984)))
                 );

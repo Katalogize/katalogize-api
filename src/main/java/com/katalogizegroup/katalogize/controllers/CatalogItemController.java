@@ -7,6 +7,7 @@ import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
+import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class CatalogItemController {
     CatalogRepository catalogRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     CatalogItemRepository catalogItemRepository;
 
     @Autowired
@@ -41,6 +45,8 @@ public class CatalogItemController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
+        CatalogItem catalogItemExists = catalogItemRepository.getCatalogItemByNameAndCatalogId(catalogItem.getName(), catalogItem.getCatalogId());
+        if (catalogItemExists != null) throw new GraphQLException("An item with this name already exists in this catalog");
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
         //Map fields by template
@@ -124,6 +130,15 @@ public class CatalogItemController {
     @QueryMapping
     public List<CatalogItem> getAllCatalogItems() {
         return catalogItemRepository.findAll();
+    }
+
+    @QueryMapping
+    public List<CatalogItem> getCatalogItemsByUsernameAndCatalogName(@Argument String username, @Argument String catalogName) {
+        Optional<User> user = userRepository.getUserByUsername(username);
+        if (user.isEmpty()) throw new GraphQLException("Invalid user");
+        Catalog catalog = catalogRepository.getCatalogByUserIdAndCatalogName(user.get().getId(), catalogName);
+        if (catalog == null) throw new GraphQLException("Invalid catalog");
+        return catalogItemRepository.getCatalogItemsByCatalogId(catalog.getId());
     }
 
     @QueryMapping
