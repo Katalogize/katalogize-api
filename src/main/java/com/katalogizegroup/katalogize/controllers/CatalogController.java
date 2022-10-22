@@ -2,8 +2,10 @@ package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.Catalog;
+import com.katalogizegroup.katalogize.models.CatalogTemplate;
 import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
+import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
@@ -16,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +27,9 @@ import java.util.Optional;
 public class CatalogController {
     @Autowired
     CatalogRepository catalogRepository;
+
+    @Autowired
+    CatalogTemplateRepository catalogTemplateRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -44,6 +50,33 @@ public class CatalogController {
         }
         Catalog catalogExists = catalogRepository.getCatalogByUserIdAndCatalogName(userDetails.getId(), catalog.getName());
         if (catalogExists != null) throw new GraphQLException("Catalog with this name already exists in this account");
+        try {
+            Catalog catalogEntity = catalogRepository.insert(catalog);
+            return catalogEntity;
+        } catch (Exception e){
+            throw new GraphQLException("Error while creating the catalog");
+        }
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public Catalog createCatalogAndTemplate(@Argument Catalog catalog, @Argument CatalogTemplate catalogTemplate) {
+        if (catalog.getName() == "") throw new GraphQLException("Invalid Catalog name");
+        UserPrincipal userDetails;
+        try {
+            userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            catalog.setUserId(userDetails.getId());
+        } catch (Exception e) {
+            throw new GraphQLException("Invalid user");
+        }
+        Catalog catalogExists = catalogRepository.getCatalogByUserIdAndCatalogName(userDetails.getId(), catalog.getName());
+        if (catalogExists != null) throw new GraphQLException("Catalog with this name already exists in this account");
+        try {
+            CatalogTemplate catalogTemplateEntity = catalogTemplateRepository.insert(catalogTemplate);
+            catalog.setTemplateIds(Arrays.asList(catalogTemplateEntity.getId()));
+        } catch (Exception e){
+            throw new GraphQLException("Error while creating the catalog template");
+        }
         try {
             Catalog catalogEntity = catalogRepository.insert(catalog);
             return catalogEntity;
