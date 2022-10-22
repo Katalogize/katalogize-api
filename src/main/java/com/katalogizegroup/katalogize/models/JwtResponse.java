@@ -15,5 +15,6 @@ public class JwtResponse {
     @NonNull private String userId;
     @NonNull private String username;
     @NonNull private String email;
+    @NonNull private boolean isAdmin;
 //    private List<String> roles;
 }

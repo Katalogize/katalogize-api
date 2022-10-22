@@ -13,9 +13,7 @@ public class User {
     @Id
     private String id = new ObjectId().toString();
 
-    @NonNull private String firstName;
-
-    @NonNull private String lastName;
+    @NonNull private String displayName;
 
     @Indexed(unique = true)
     @NonNull private String email;
@@ -26,6 +24,8 @@ public class User {
     @NonNull private String username;
 
     @NonNull private String password;
+
+    @Getter @Setter private  boolean isAdmin = false;
 
 //    @Transient
 //    public static final String SEQUENCE_NAME = "users_sequence";

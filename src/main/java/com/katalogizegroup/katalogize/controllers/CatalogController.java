@@ -14,6 +14,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,7 @@ public class CatalogController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public Catalog createCatalogAndTemplate(@Argument Catalog catalog, @Argument CatalogTemplate catalogTemplate) {
-        if (catalog.getName() == "") throw new GraphQLException("Invalid Catalog name");
+        if (catalog.getName().equals("")) throw new GraphQLException("Invalid Catalog name");
         UserPrincipal userDetails;
         try {
             userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -90,8 +91,20 @@ public class CatalogController {
     public Catalog deleteCatalog(@Argument String id) {
         Optional<Catalog> catalogEntity = catalogRepository.findById(id);
         if (!catalogEntity.isEmpty()) {
-            catalogRepository.deleteById(id);
-            return catalogEntity.get();
+            boolean isAdmin = false;
+            String userId = "";
+            try {
+                UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                isAdmin = userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
+                userId = userDetails.getId();
+            } finally {
+                if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
+                    catalogRepository.deleteById(id);
+                    return catalogEntity.get();
+                } else {
+                    throw new GraphQLException("Unauthorized");
+                }
+            }
         }
         return null;
     }

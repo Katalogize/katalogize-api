@@ -14,7 +14,8 @@ type Query {
     getAllCatalogTemplates: [CatalogTemplate]
 
     getAllUsers: [User]
-    getUserById(id: ID): User
+    getUserById(id: ID!): User
+    getUserByUsername(username: String!): User
     getLoggedUser: User
 }
 
@@ -53,10 +54,10 @@ type ItemFieldString {
 
 type User {
     id: ID
-    firstName: String
-    lastName: String
+    displayName: String
     email: String
     username: String
+    isAdmin: Boolean
 }
 
 type CatalogTemplate {
@@ -78,5 +79,5 @@ type AuthenticationData {
     userId: ID
     username: String
     email: String
-    roles: [String]
+    isAdmin: String
 }

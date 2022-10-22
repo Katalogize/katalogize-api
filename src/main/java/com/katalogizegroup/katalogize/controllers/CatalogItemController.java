@@ -45,6 +45,7 @@ public class CatalogItemController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
+        if (catalogItem.getName().equals("create-katalog-item")) throw new GraphQLException("Invalid Item name");
         CatalogItem catalogItemExists = catalogItemRepository.getCatalogItemByNameAndCatalogId(catalogItem.getName(), catalogItem.getCatalogId());
         if (catalogItemExists != null) throw new GraphQLException("An item with this name already exists in this catalog");
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());

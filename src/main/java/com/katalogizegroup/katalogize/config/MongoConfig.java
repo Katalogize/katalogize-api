@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,15 +24,20 @@ public class MongoConfig {
     @Autowired
     SequenceGeneratorService sequenceGenerator;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Bean
     CommandLineRunner commandLineRunner(CatalogRepository catalogRepository, CatalogItemRepository catalogItemRepository, UserRepository userRepository, CatalogTemplateRepository templateRepository, RefreshTokenRepository refreshTokenRepository) {
 //        (int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME);
         if (catalogRepository.findAll().size() == 0 && userRepository.findAll().size() == 0) {
             return strings -> {
                 List<User> users = Arrays.asList(
-                        new User("User1", "Mock1", "katalogize@email.com", "FakeUser1", "FakePassword1"),
-                        new User("User2", "Mock2", "katalogize2@email.com", "FakeUser2", "FakePassword2")
+                        new User("Katalogize Admin", "katalogize@email.com", "KatalogizeAdmin", passwordEncoder.encode("KatalogizeAdmin")),
+                        new User("Katalogize Team","katalogize2@email.com", "KatalogizeUser", passwordEncoder.encode("KatalogizeUser"))
                 );
+
+                users.get(0).setAdmin(true);
 
                 List<CatalogTemplate> templates = Arrays.asList(
                         new CatalogTemplate("Default template", Arrays.asList(), true),

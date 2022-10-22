@@ -65,7 +65,7 @@ public class UserController {
         UserPrincipal userDetails = (UserPrincipal)authentication.getPrincipal();
 //        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
         String refreshToken = refreshTokenService.createRefreshToken(userDetails.getId()).getToken();
-        return new JwtResponse(jwt, refreshToken, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail());
+        return new JwtResponse(jwt, refreshToken, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), userDetails.getIsAdmin());
     }
 
     @MutationMapping
@@ -80,7 +80,7 @@ public class UserController {
             User user = userOptional.get();
             String accessToken = tokenProvider.createTokenFromUserId(user.getId());
             String refreshedToken = refreshTokenService.createRefreshToken(tokenProvider.getUserIdFromToken(accessToken)).getToken();
-            return new JwtResponse(accessToken, refreshedToken, user.getId(), user.getUsername(), user.getEmail());
+            return new JwtResponse(accessToken, refreshedToken, user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
         }
     }
 
@@ -94,7 +94,7 @@ public class UserController {
             throw new GraphQLException("Username is already taken!");
         }
 
-        User userObject = new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getUsername(), passwordEncoder.encode(user.getPassword()));
+        User userObject = new User(user.getDisplayName(), user.getEmail(), user.getUsername(), passwordEncoder.encode(user.getPassword()));
         User userEntity = userRepository.insert(userObject);
 
         return "User registered successfully!";
@@ -148,6 +148,11 @@ public class UserController {
     public Optional<User> getLoggedUser() {
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.findById(userDetails.getId());
+    }
+
+    @QueryMapping
+    public Optional<User> getUserByUsername(@Argument String username) {
+        return userRepository.getUserByUsername(username);
     }
 
     @SchemaMapping

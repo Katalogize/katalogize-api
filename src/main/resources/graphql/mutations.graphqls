@@ -60,8 +60,7 @@ input TemplateFieldInput {
 }
 
 input UserInput {
-    firstName: String!
-    lastName: String!
+    displayName: String!
     email: String!
     username: String!
     password: String!
