@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,19 +46,19 @@ public class CatalogItemController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
-        if (catalogItem.getName().equals("create-katalog-item")) throw new GraphQLException("Invalid Item name");
+        if (catalogItem.getName().equals("create-item") || catalogItem.getName().equals("")) throw new GraphQLException("Invalid Item name");
         CatalogItem catalogItemExists = catalogItemRepository.getCatalogItemByNameAndCatalogId(catalogItem.getName(), catalogItem.getCatalogId());
         if (catalogItemExists != null) throw new GraphQLException("An item with this name already exists in this catalog");
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
         //Map fields by template
         if (!catalog.isEmpty() && !template.isEmpty() && catalog.get().getTemplateIds().contains(catalogItem.getTemplateId())) {
-            CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), Arrays.asList());
+            CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), new ArrayList<>());
 
             //Ensure all template fields are present
             for(TemplateField templateField : template.get().getTemplateFields()) {
                 switch (templateField.getFieldType()){
-                    case 1:
+                    case 2:
                         Optional<ItemFieldInt> itemInt;
                         itemInt = catalogItem.getIntegerFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
                         if (!itemInt.isEmpty()) {
@@ -67,7 +68,7 @@ public class CatalogItemController {
                             throw new GraphQLException("Catalog not following the right template order");
                         }
                         break;
-                    case 2:
+                    case 1:
                         Optional<ItemFieldString> itemString;
                         itemString = catalogItem.getStringFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
                         if (!itemString.isEmpty()) {

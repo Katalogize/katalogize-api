@@ -19,6 +19,6 @@ public class CatalogItemInput {
 
     @NonNull private String name;
 
-    private List<ItemFieldInt> integerFields;
-    private List<ItemFieldString> stringFields;
+    @NonNull private List<ItemFieldInt> integerFields;
+    @NonNull private List<ItemFieldString> stringFields;
 }
