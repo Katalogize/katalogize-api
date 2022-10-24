@@ -7,6 +7,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+import java.util.Date;
+
 @Data
 @Document(collection = "users")
 public class User {
@@ -26,6 +29,8 @@ public class User {
     @NonNull private String password;
 
     @Getter @Setter private  boolean isAdmin = false;
+
+    @NonNull private Instant creationDate = Instant.now();
 
 //    @Transient
 //    public static final String SEQUENCE_NAME = "users_sequence";

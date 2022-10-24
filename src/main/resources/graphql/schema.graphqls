@@ -35,6 +35,7 @@ type CatalogItem {
     catalogId: ID
     templateId: ID
     template: CatalogTemplate
+    creationDate: String
     fields: [ItemField]
 }
 

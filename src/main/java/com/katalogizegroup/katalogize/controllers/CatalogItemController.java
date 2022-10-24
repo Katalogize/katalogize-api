@@ -1,5 +1,6 @@
 package com.katalogizegroup.katalogize.controllers;
 
+import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.*;
 import com.katalogizegroup.katalogize.models.itemfields.ItemField;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldInt;
@@ -10,12 +11,15 @@ import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -46,15 +50,17 @@ public class CatalogItemController {
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
+        Optional<CatalogItem> catalogItemExists = catalogItemRepository.findById(catalogItem.getId());
+        if (catalogItemExists.isEmpty()) catalogItem.setId(new ObjectId().toString());
         if (catalogItem.getName().equals("create-item") || catalogItem.getName().equals("")) throw new GraphQLException("Invalid Item name");
-        CatalogItem catalogItemExists = catalogItemRepository.getCatalogItemByNameAndCatalogId(catalogItem.getName(), catalogItem.getCatalogId());
-        if (catalogItemExists != null) throw new GraphQLException("An item with this name already exists in this catalog");
+        CatalogItem catalogItemNameExists = catalogItemRepository.getCatalogItemByNameAndCatalogId(catalogItem.getName(), catalogItem.getCatalogId());
+        if (catalogItemNameExists != null && !catalogItemNameExists.getId().equals(catalogItem.getId())) throw new GraphQLException("An item with this name already exists in this catalog");
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
         //Map fields by template
         if (!catalog.isEmpty() && !template.isEmpty() && catalog.get().getTemplateIds().contains(catalogItem.getTemplateId())) {
             CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), new ArrayList<>());
-
+            if (!catalogItemExists.isEmpty()) createdCatalogItem.setId(catalogItemExists.get().getId());
             //Ensure all template fields are present
             for(TemplateField templateField : template.get().getTemplateFields()) {
                 switch (templateField.getFieldType()){
@@ -111,7 +117,7 @@ public class CatalogItemController {
             }
 
             //Create and save catalog
-            CatalogItem catalogItemEntity = catalogItemRepository.insert(createdCatalogItem);
+            CatalogItem catalogItemEntity = catalogItemRepository.save(createdCatalogItem);
             return catalogItemEntity;
         } else {
             throw new GraphQLException("Catalog or Template does not exist or are not associated");
@@ -122,9 +128,23 @@ public class CatalogItemController {
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem deleteCatalogItem(@Argument String id) {
         Optional<CatalogItem> catalogItemEntity = catalogItemRepository.findById(id);
+        boolean isAdmin = false;
+        String userId = "";
         if (!catalogItemEntity.isEmpty()) {
-            catalogItemRepository.deleteById(id);
-            return catalogItemEntity.get();
+            //Check if user is allowed to delete
+            Optional<Catalog> catalogEntity = catalogRepository.findById(catalogItemEntity.get().getCatalogId());
+            try {
+                UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                isAdmin = userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
+                userId = userDetails.getId();
+            } finally {
+                if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
+                    catalogItemRepository.deleteById(id);
+                    return catalogItemEntity.get();
+                } else {
+                    throw new GraphQLException("Unauthorized");
+                }
+            }
         }
         return null;
     }

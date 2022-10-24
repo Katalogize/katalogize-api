@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -18,6 +19,7 @@ public class Catalog {
     @NonNull private boolean isPrivate;
     @NonNull private String userId;
     @NonNull private List<String> templateIds;
+    @NonNull private Instant creationDate = Instant.now();
 
 //    @Transient
 //    public static final String SEQUENCE_NAME = "catalogs_sequence";

@@ -30,6 +30,7 @@ input CatalogInput {
 input CatalogItemInput {
     catalogId: ID!
     name: String!
+    id: ID
     templateId: ID
     integerFields: [ItemFieldIntInput]
     stringFields: [ItemFieldStringInput]

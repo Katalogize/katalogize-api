@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class CatalogItemInput {
     @Id
-    private String id = new ObjectId().toString();;
+    @NonNull private String id;
 
     @NonNull private String catalogId;
 
