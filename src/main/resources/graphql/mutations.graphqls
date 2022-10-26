@@ -2,10 +2,10 @@ type Mutation {
     createCatalog (catalog: CatalogInput): Catalog
     deleteCatalog (id: ID!): Catalog
 
-    createCatalogItem (catalogItem: CatalogItemInput): CatalogItem
+    saveCatalogItem (catalogItem: CatalogItemInput): CatalogItem
     deleteCatalogItem (id: ID): CatalogItem
 
-    createCatalogAndTemplate(catalog: CatalogInput, catalogTemplate: CatalogTemplateInput): Catalog
+    saveCatalogAndTemplate(catalog: CatalogInput, catalogTemplate: CatalogTemplateInput): Catalog
 
     createCatalogTemplate(catalogTemplate: CatalogTemplateInput): CatalogTemplate
     deleteCatalogTemplate(id: ID): CatalogTemplate

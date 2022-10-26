@@ -61,7 +61,7 @@ public class CatalogController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public Catalog createCatalogAndTemplate(@Argument Catalog catalog, @Argument CatalogTemplate catalogTemplate) {
+    public Catalog saveCatalogAndTemplate(@Argument Catalog catalog, @Argument CatalogTemplate catalogTemplate) {
         if (catalog.getName().equals("")) throw new GraphQLException("Invalid Catalog name");
         UserPrincipal userDetails;
         try {

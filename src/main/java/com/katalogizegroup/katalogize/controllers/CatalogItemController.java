@@ -49,7 +49,7 @@ public class CatalogItemController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public CatalogItem createCatalogItem(@Argument CatalogItemInput catalogItem) {
+    public CatalogItem saveCatalogItem(@Argument CatalogItemInput catalogItem) {
         Optional<CatalogItem> catalogItemExists = catalogItemRepository.findById(catalogItem.getId());
         if (catalogItemExists.isEmpty()) catalogItem.setId(new ObjectId().toString());
         if (catalogItem.getName().equals("create-item") || catalogItem.getName().equals("")) throw new GraphQLException("Invalid Item name");
