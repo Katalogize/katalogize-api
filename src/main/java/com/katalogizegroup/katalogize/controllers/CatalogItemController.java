@@ -3,7 +3,7 @@ package com.katalogizegroup.katalogize.controllers;
 import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.*;
 import com.katalogizegroup.katalogize.models.itemfields.ItemField;
-import com.katalogizegroup.katalogize.models.itemfields.ItemFieldInt;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
@@ -22,10 +22,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,11 +63,11 @@ public class CatalogItemController {
             for(TemplateField templateField : template.get().getTemplateFields()) {
                 switch (templateField.getFieldType()){
                     case 2:
-                        Optional<ItemFieldInt> itemInt;
-                        itemInt = catalogItem.getIntegerFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        Optional<ItemFieldNumber> itemInt;
+                        itemInt = catalogItem.getNumberFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
                         if (!itemInt.isEmpty()) {
                             createdCatalogItem.addField(itemInt.get());
-                            catalogItem.getIntegerFields().remove(itemInt.get());
+                            catalogItem.getNumberFields().remove(itemInt.get());
                         } else {
                             throw new GraphQLException("Catalog not following the right template order");
                         }
@@ -89,14 +87,14 @@ public class CatalogItemController {
                 }
             }
             //Add non template fields
-            if (!catalogItem.getIntegerFields().isEmpty() || !catalogItem.getStringFields().isEmpty()) {
+            if (!catalogItem.getNumberFields().isEmpty() || !catalogItem.getStringFields().isEmpty()) {
                 if (template.get().isAllowNewFields()) {
-                    while (!catalogItem.getIntegerFields().isEmpty() || !catalogItem.getStringFields().isEmpty()) {
-                        if (!catalogItem.getIntegerFields().isEmpty()) {
-                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getOrder() == catalogItem.getIntegerFields().get(0).getOrder()).findFirst();
+                    while (!catalogItem.getNumberFields().isEmpty() || !catalogItem.getStringFields().isEmpty()) {
+                        if (!catalogItem.getNumberFields().isEmpty()) {
+                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getOrder() == catalogItem.getNumberFields().get(0).getOrder()).findFirst();
                             if (existentItemOrder.isEmpty()) {
-                                createdCatalogItem.addField(catalogItem.getIntegerFields().get(0));
-                                catalogItem.getIntegerFields().remove(catalogItem.getIntegerFields().get(0));
+                                createdCatalogItem.addField(catalogItem.getNumberFields().get(0));
+                                catalogItem.getNumberFields().remove(catalogItem.getNumberFields().get(0));
                             } else {
                                 throw new GraphQLException("Repeated order found on item fields");
                             }

@@ -1,7 +1,7 @@
 package com.katalogizegroup.katalogize.config;
 
 import com.katalogizegroup.katalogize.models.*;
-import com.katalogizegroup.katalogize.models.itemfields.ItemFieldInt;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import com.katalogizegroup.katalogize.repositories.*;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
@@ -51,10 +51,10 @@ public class MongoConfig {
                 );
 
                 List<CatalogItem> catalogItems = Arrays.asList(
-                        new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Summer Renaissance", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldInt(2, "Likes", 9))),
-                        new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Energy", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldInt(2, "Likes", 9))),
-                        new CatalogItem(catalogs.get(1).getId(), templates.get(1).getId(), "It Takes Two", Arrays.asList(new ItemFieldString(1, "", "A coop game"), new ItemFieldInt(2, "", 9))),
-                        new CatalogItem(catalogs.get(2).getId(), templates.get(0).getId(), "Gremlins", Arrays.asList(new ItemFieldString(1, "Description", "A gremlins movie"), new ItemFieldInt(2, "Year", 1984)))
+                        new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Summer Renaissance", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldNumber(2, "Likes", 9))),
+                        new CatalogItem(catalogs.get(0).getId(), templates.get(0).getId(), "Energy", Arrays.asList(new ItemFieldString(1, "Artist", "Beyonce"), new ItemFieldNumber(2, "Likes", 9))),
+                        new CatalogItem(catalogs.get(1).getId(), templates.get(1).getId(), "It Takes Two", Arrays.asList(new ItemFieldString(1, "", "A coop game"), new ItemFieldNumber(2, "", 9))),
+                        new CatalogItem(catalogs.get(2).getId(), templates.get(0).getId(), "Gremlins", Arrays.asList(new ItemFieldString(1, "Description", "A gremlins movie"), new ItemFieldNumber(2, "Year", 1984)))
                 );
 
                 userRepository.insert(users);

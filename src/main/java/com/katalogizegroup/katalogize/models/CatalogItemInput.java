@@ -1,9 +1,8 @@
 package com.katalogizegroup.katalogize.models;
 
-import com.katalogizegroup.katalogize.models.itemfields.ItemFieldInt;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -19,6 +18,6 @@ public class CatalogItemInput {
 
     @NonNull private String name;
 
-    @NonNull private List<ItemFieldInt> integerFields;
+    @NonNull private List<ItemFieldNumber> numberFields;
     @NonNull private List<ItemFieldString> stringFields;
 }

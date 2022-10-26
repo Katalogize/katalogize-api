@@ -32,14 +32,14 @@ input CatalogItemInput {
     name: String!
     id: ID
     templateId: ID
-    integerFields: [ItemFieldIntInput]
+    numberFields: [ItemFieldNumberInput]
     stringFields: [ItemFieldStringInput]
 }
 
-input ItemFieldIntInput {
+input ItemFieldNumberInput {
     order: Int
     name: String!
-    value: Int
+    value: Float
 }
 
 input ItemFieldStringInput {

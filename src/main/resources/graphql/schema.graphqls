@@ -39,12 +39,12 @@ type CatalogItem {
     fields: [ItemField]
 }
 
-union ItemField = ItemFieldInt | ItemFieldString
+union ItemField = ItemFieldNumber | ItemFieldString
 
-type ItemFieldInt {
+type ItemFieldNumber {
     order: Int
     name: String!
-    value: Int
+    value: Float
 }
 
 type ItemFieldString {
