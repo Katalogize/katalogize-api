@@ -56,8 +56,10 @@ type ItemFieldString {
 type User {
     id: ID
     displayName: String
+    description: String
     email: String
     username: String
+    picture: String
     isAdmin: Boolean
 }
 

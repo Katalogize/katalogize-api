@@ -28,6 +28,10 @@ public class User {
 
     @NonNull private String password;
 
+    @Getter @Setter private  String description;
+
+    @Getter @Setter private  String picture;
+
     @Getter @Setter private  boolean isAdmin = false;
 
     @NonNull private Instant creationDate = Instant.now();

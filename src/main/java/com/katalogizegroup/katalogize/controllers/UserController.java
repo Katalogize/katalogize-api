@@ -9,6 +9,7 @@ import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.RefreshTokenService;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import com.katalogizegroup.katalogize.services.UploadFileService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -49,6 +50,9 @@ public class UserController {
 
     @Autowired
     RefreshTokenService refreshTokenService;
+
+    @Autowired
+    UploadFileService uploadFileService;
 
     @MutationMapping
     public JwtResponse signIn(@Argument String username, @Argument String password) {
@@ -120,6 +124,26 @@ public class UserController {
         }catch (Exception e) {
             throw new GraphQLException("Error while creating user");
         }
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public User addUserPicture(@Argument String encodedFile) {
+        User user = deleteUserPicture();
+        String pictureLink = uploadFileService.uploadFile(user.getUsername(), "profile",encodedFile);
+        user.setPicture(pictureLink);
+        return userRepository.save(user);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public User deleteUserPicture() {
+        User user = getLoggedUser().get();
+        if (user.getPicture() != null) {
+            uploadFileService.deleteFile(user.getPicture());
+            user.setPicture(null);
+        }
+        return userRepository.save(user);
     }
 
     @MutationMapping
