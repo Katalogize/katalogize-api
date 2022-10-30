@@ -4,6 +4,7 @@ import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.Catalog;
 import com.katalogizegroup.katalogize.models.CatalogTemplate;
 import com.katalogizegroup.katalogize.models.User;
+import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
@@ -28,6 +29,9 @@ import java.util.Optional;
 public class CatalogController {
     @Autowired
     CatalogRepository catalogRepository;
+
+    @Autowired
+    CatalogItemRepository catalogItemRepository;
 
     @Autowired
     CatalogTemplateRepository catalogTemplateRepository;
@@ -99,6 +103,7 @@ public class CatalogController {
                 userId = userDetails.getId();
             } finally {
                 if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
+                    catalogItemRepository.deleteAllByCatalogId(catalogEntity.get().getId());
                     catalogRepository.deleteById(id);
                     return catalogEntity.get();
                 } else {

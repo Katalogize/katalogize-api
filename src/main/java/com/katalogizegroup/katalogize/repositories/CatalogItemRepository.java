@@ -12,4 +12,7 @@ public interface CatalogItemRepository extends MongoRepository<CatalogItem, Stri
 
     @Query("{name : ?0, catalogId : ?1}")
     CatalogItem getCatalogItemByNameAndCatalogId(String name, String id);
+
+    @Query(value="{catalogId : ?0}", delete = true)
+    List<CatalogItem> deleteAllByCatalogId(String catalogId);
 }
