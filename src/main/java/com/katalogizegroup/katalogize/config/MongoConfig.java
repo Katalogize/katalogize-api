@@ -41,7 +41,7 @@ public class MongoConfig {
 
                 List<CatalogTemplate> templates = Arrays.asList(
                         new CatalogTemplate("Default template", Arrays.asList(), true),
-                        new CatalogTemplate("Games template", Arrays.asList(new TemplateField(1, "Description", 2), new TemplateField(2, "Stars", 1)), false)
+                        new CatalogTemplate("Games template", Arrays.asList(new TemplateField(1, "Description", 1), new TemplateField(2, "Stars", 2)), false)
                 );
 
                 List<Catalog> catalogs = Arrays.asList(
