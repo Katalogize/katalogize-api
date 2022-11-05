@@ -3,6 +3,7 @@ package com.katalogizegroup.katalogize.controllers;
 import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
 import com.katalogizegroup.katalogize.models.*;
 import com.katalogizegroup.katalogize.models.itemfields.ItemField;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
@@ -10,6 +11,7 @@ import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import com.katalogizegroup.katalogize.services.UploadFileService;
 import graphql.GraphQLException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/CatalogItem")
@@ -45,6 +48,9 @@ public class CatalogItemController {
     @Autowired
     SequenceGeneratorService sequenceGenerator;
 
+    @Autowired
+    UploadFileService uploadFileService;
+
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem saveCatalogItem(@Argument CatalogItemInput catalogItem) {
@@ -58,10 +64,22 @@ public class CatalogItemController {
         //Map fields by template
         if (!catalog.isEmpty() && !template.isEmpty() && catalog.get().getTemplateIds().contains(catalogItem.getTemplateId())) {
             CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), new ArrayList<>());
-            if (!catalogItemExists.isEmpty()) createdCatalogItem.setId(catalogItemExists.get().getId());
+            if (!catalogItemExists.isEmpty()) {
+                createdCatalogItem.setId(catalogItemExists.get().getId());
+            }
             //Ensure all template fields are present
             for(TemplateField templateField : template.get().getTemplateFields()) {
                 switch (templateField.getFieldType()){
+                    case 1:
+                        Optional<ItemFieldString> itemString;
+                        itemString = catalogItem.getStringFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        if (!itemString.isEmpty()) { //Exists in template
+                            createdCatalogItem.addField(itemString.get());
+                            catalogItem.getStringFields().remove(itemString.get());
+                        } else {
+                            throw new GraphQLException("Catalog not following the right template order");
+                        }
+                        break;
                     case 2:
                         Optional<ItemFieldNumber> itemInt;
                         itemInt = catalogItem.getNumberFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
@@ -72,12 +90,37 @@ public class CatalogItemController {
                             throw new GraphQLException("Catalog not following the right template order");
                         }
                         break;
-                    case 1:
-                        Optional<ItemFieldString> itemString;
-                        itemString = catalogItem.getStringFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
-                        if (!itemString.isEmpty()) {
-                            createdCatalogItem.addField(itemString.get());
-                            catalogItem.getStringFields().remove(itemString.get());
+                    case 3:
+                        Optional<ItemFieldImage> itemImage;
+                        itemImage = catalogItem.getImageFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        List<UploadFile> existentImages = new ArrayList<>(); //Get existent images for this field
+                        if (!catalogItemExists.isEmpty()) {
+                            Optional<ItemField> existentFields = catalogItemExists.get().getFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                            if (!existentFields.isEmpty()) existentImages = ((ItemFieldImage) existentFields.get()).getValue();
+                        }
+                        if (!itemImage.isEmpty()) { //Add images and upload the ones that have data
+                            ItemFieldImage images = itemImage.get();
+                            List<UploadFile> files = new ArrayList<>();
+                            if (images.getValue() == null) images.setValue(new ArrayList<>());
+                            for(UploadFile file : images.getValue()) {
+                                if (file.getData() != null) {
+                                    String filePath = uploadFileService.uploadFile(catalogItem.getCatalogId()+"/"+createdCatalogItem.getId(), "item", file.getData()); //Upload new image
+                                    files.add(new UploadFile(filePath, null));
+                                } else {
+                                    files.add(new UploadFile(file.getPath(), null));
+                                }
+                            }
+                            if (!existentImages.isEmpty()) { //Delete missing images
+                                for(UploadFile image: existentImages) {
+                                    Optional<UploadFile> addedImage = files.stream().filter(file -> file.getPath().equals(image.getPath())).findFirst();
+                                    if (addedImage.isEmpty()) {
+                                        uploadFileService.deleteFile(image.getPath());
+                                    }
+                                }
+                            }
+                            images.setValue(files);
+                            createdCatalogItem.addField(images);
+                            catalogItem.getImageFields().remove(itemImage.get());
                         } else {
                             throw new GraphQLException("Catalog not following the right template order");
                         }
@@ -137,6 +180,12 @@ public class CatalogItemController {
                 userId = userDetails.getId();
             } finally {
                 if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
+                    List<ItemField> imagesField = catalogItemEntity.get().getFields().stream().filter(field -> field.getClass() == ItemFieldImage.class).collect(Collectors.toList());
+                    for (ItemField field: imagesField) {
+                        for (UploadFile image : ((ItemFieldImage) field).getValue()) {
+                            uploadFileService.deleteFile(image.getPath());
+                        }
+                    }
                     catalogItemRepository.deleteById(id);
                     return catalogItemEntity.get();
                 } else {
@@ -195,5 +244,14 @@ public class CatalogItemController {
             }
         }
         return itemFields;
+    }
+
+    @SchemaMapping
+    public List<UploadFile> value(ItemFieldImage itemImage) {
+        List<UploadFile> images = new ArrayList<>();
+        for(UploadFile file: itemImage.getValue()) {
+            images.add(file);
+        }
+        return images;
     }
 }

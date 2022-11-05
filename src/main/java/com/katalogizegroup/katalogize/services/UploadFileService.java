@@ -45,7 +45,7 @@ public class UploadFileService {
     @Value("${gcp.config.dir.name}")
     private String gcpDirectoryName;
 
-    public String uploadFile(String username, String imageCategory,String fileUpload) {
+    public String uploadFile(String folderName, String imageCategory, String fileUpload) {
         try {
             //File conversion
             String fileType = fileUpload.split(";")[0].split(":")[1];
@@ -66,7 +66,7 @@ public class UploadFileService {
 
             //Upload to GCS
             String id = new ObjectId().toString();
-            Blob blob = bucket.create(gcpDirectoryName + "/" + username + "/" + imageCategory + "-" + id + ".png", imageBytes, Files.probeContentType(outputFile.toPath()), Bucket.BlobTargetOption.predefinedAcl(Storage.PredefinedAcl.PUBLIC_READ));
+            Blob blob = bucket.create(gcpDirectoryName + "/" + folderName + "/" + imageCategory + "-" + id + ".png", imageBytes, Files.probeContentType(outputFile.toPath()), Bucket.BlobTargetOption.predefinedAcl(Storage.PredefinedAcl.PUBLIC_READ));
             if (blob == null) throw new GraphQLException("An error occurred while storing data to GCS");
             String name = blob.getName();
             return name;

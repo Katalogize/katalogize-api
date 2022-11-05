@@ -39,7 +39,7 @@ type CatalogItem {
     fields: [ItemField]
 }
 
-union ItemField = ItemFieldNumber | ItemFieldString
+union ItemField = ItemFieldNumber | ItemFieldString | ItemFieldImage
 
 type ItemFieldNumber {
     order: Int
@@ -51,6 +51,17 @@ type ItemFieldString {
     order: Int
     name: String!
     value: String
+}
+
+type ItemFieldImage {
+    order: Int
+    name: String!
+    value: [UploadFile]
+}
+
+type UploadFile {
+    path: String,
+    data: String
 }
 
 type User {

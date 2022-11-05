@@ -37,6 +37,7 @@ input CatalogItemInput {
     templateId: ID
     numberFields: [ItemFieldNumberInput]
     stringFields: [ItemFieldStringInput]
+    imageFields: [ItemFieldImageInput]
 }
 
 input ItemFieldNumberInput {
@@ -49,6 +50,17 @@ input ItemFieldStringInput {
     order: Int
     name: String!
     value: String
+}
+
+input ItemFieldImageInput {
+    order: Int
+    name: String!
+    value: [UploadFileInput]
+}
+
+input UploadFileInput {
+    path: String,
+    data: String
 }
 
 input CatalogTemplateInput {

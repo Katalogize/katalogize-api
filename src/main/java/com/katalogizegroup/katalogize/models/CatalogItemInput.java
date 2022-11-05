@@ -1,5 +1,6 @@
 package com.katalogizegroup.katalogize.models;
 
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import lombok.*;
@@ -20,4 +21,5 @@ public class CatalogItemInput {
 
     @NonNull private List<ItemFieldNumber> numberFields;
     @NonNull private List<ItemFieldString> stringFields;
+    @NonNull private List<ItemFieldImage> imageFields;
 }

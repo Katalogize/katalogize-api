@@ -1,14 +1,15 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
-import com.katalogizegroup.katalogize.models.Catalog;
-import com.katalogizegroup.katalogize.models.CatalogTemplate;
-import com.katalogizegroup.katalogize.models.User;
+import com.katalogizegroup.katalogize.models.*;
+import com.katalogizegroup.katalogize.models.itemfields.ItemField;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import com.katalogizegroup.katalogize.services.UploadFileService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/Catalog")
@@ -41,6 +43,9 @@ public class CatalogController {
 
     @Autowired
     SequenceGeneratorService sequenceGenerator;
+
+    @Autowired
+    UploadFileService uploadFileService;
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
@@ -103,7 +108,16 @@ public class CatalogController {
                 userId = userDetails.getId();
             } finally {
                 if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
-                    catalogItemRepository.deleteAllByCatalogId(catalogEntity.get().getId());
+                    List<CatalogItem> deletedItems = catalogItemRepository.deleteAllByCatalogId(catalogEntity.get().getId());
+                    for (CatalogItem item : deletedItems) {
+                        List<ItemField> imagesField = item.getFields().stream().filter(field -> field.getClass() == ItemFieldImage.class).collect(Collectors.toList());
+                        for (ItemField field: imagesField) {
+                            for (UploadFile image : ((ItemFieldImage) field).getValue()) {
+                                uploadFileService.deleteFile(image.getPath());
+                            }
+                        }
+                    }
+                    catalogTemplateRepository.deleteById(catalogEntity.get().getTemplateIds().get(0));
                     catalogRepository.deleteById(id);
                     return catalogEntity.get();
                 } else {
