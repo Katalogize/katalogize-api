@@ -17,6 +17,7 @@ public class Catalog {
     @NonNull private String name;
     @NonNull private String description;
     @NonNull private boolean isPrivate;
+    @NonNull private boolean isOfficial = false;
     @NonNull private String userId;
     @NonNull private List<String> templateIds;
     @NonNull private Instant creationDate = Instant.now();

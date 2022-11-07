@@ -134,6 +134,11 @@ public class CatalogController {
     }
 
     @QueryMapping
+    public List<Catalog> getOfficialCatalogs() {
+        return catalogRepository.getOfficialCatalogs();
+    }
+
+    @QueryMapping
     public Optional<Catalog> getCatalogById(@Argument String id) {
         return  catalogRepository.findById(id);
     }

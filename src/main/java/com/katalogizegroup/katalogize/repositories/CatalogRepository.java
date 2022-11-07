@@ -14,4 +14,7 @@ public interface CatalogRepository extends MongoRepository<Catalog, String> {
 
     @Query("{userId : ?0, isPrivate: false}")
     List<Catalog> getPublicCatalogsByUserId(String userId);
+
+    @Query("{isOfficial: true}")
+    List<Catalog> getOfficialCatalogs();
 }

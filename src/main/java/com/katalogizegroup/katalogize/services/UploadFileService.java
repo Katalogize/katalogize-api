@@ -49,7 +49,7 @@ public class UploadFileService {
         try {
             //File conversion
             String fileType = fileUpload.split(";")[0].split(":")[1];
-            if (!fileType.equals("image/png")) throw new GraphQLException("Unsupported file type");
+            if (!fileType.equals("image/png") && !fileType.equals("image/jpeg") && !fileType.equals("image/jpg")) throw new GraphQLException("Unsupported file type");
             String base64Image = fileUpload.split(",")[1];
             byte[] imageBytes = DatatypeConverter.parseBase64Binary(base64Image);
             File outputFile = new File("image.png");

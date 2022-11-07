@@ -1,5 +1,6 @@
 type Query {
     getAllCatalogs: [Catalog]
+    getOfficialCatalogs: [Catalog]
     getCatalogById(id: ID): Catalog
     getAllCatalogsByUserId(id: ID): [Catalog]
     getAllCatalogsByLoggedUser: [Catalog]
@@ -26,6 +27,7 @@ type Catalog {
     user: User
     templates: [CatalogTemplate]
     isPrivate: Boolean
+    isOfficial: Boolean
     items: [CatalogItem]
 }
 
