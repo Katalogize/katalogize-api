@@ -40,7 +40,7 @@ class CatalogControllerTest {
 
     @Test
     void getAllCatalogs() {
-        List<Catalog> catalogs = Arrays.asList(new Catalog(0, "Mock", "Mock", 0, Arrays.asList(0)), new Catalog(0, "Mock", "Mock", 0, Arrays.asList(0)));
+        List<Catalog> catalogs = Arrays.asList(new Catalog("Test", "Mock", false, "0", Arrays.asList("0")), new Catalog("Test2", "Mock", false, "0", Arrays.asList("0")));
         Mockito.when(catalogRepository.findAll()).thenReturn(catalogs);
         List<Catalog> response = catalogController.getAllCatalogs();
         assertEquals(catalogs, response);

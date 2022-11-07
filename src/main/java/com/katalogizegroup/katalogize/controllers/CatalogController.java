@@ -129,6 +129,7 @@ public class CatalogController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Catalog> getAllCatalogs() {
         return catalogRepository.findAll();
     }

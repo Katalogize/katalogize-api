@@ -26,7 +26,7 @@ class CatalogControllerIntTest {
 
     @Test
     void testGetAllCatalogsShouldReturnAllCatalogs() {
-        Mockito.when(catalogRepository.findAll()).thenReturn(Arrays.asList(new Catalog(0, "Mock", "Mock", 0, Arrays.asList(0)), new Catalog(0, "Mock", "Mock", 0, Arrays.asList(0))));
+        Mockito.when(catalogRepository.findAll()).thenReturn(Arrays.asList(new Catalog("Test", "Mock", false, "0", Arrays.asList("0")), new Catalog("Test2", "Mock", false, "0", Arrays.asList("0"))));
 
         //language=GraphQL
         String document = """
