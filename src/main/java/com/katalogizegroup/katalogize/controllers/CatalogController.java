@@ -8,6 +8,7 @@ import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
+import com.katalogizegroup.katalogize.services.CatalogService;
 import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import com.katalogizegroup.katalogize.services.UploadFileService;
 import graphql.GraphQLException;
@@ -29,6 +30,10 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(value = "/Catalog")
 public class CatalogController {
+
+    @Autowired
+    CatalogService catalogService;
+
     @Autowired
     CatalogRepository catalogRepository;
 
@@ -136,7 +141,7 @@ public class CatalogController {
 
     @QueryMapping
     public List<Catalog> getOfficialCatalogs() {
-        return catalogRepository.getOfficialCatalogs();
+        return catalogService.getOfficialCatalogs();
     }
 
     @QueryMapping

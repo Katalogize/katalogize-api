@@ -24,15 +24,23 @@ class CatalogControllerIntTest {
     @MockBean
     private CatalogRepository catalogRepository;
 
+    static class CatalogMock {
+        private String name;
+
+        public CatalogMock() {}
+        public String getDisplayName() {
+            return name;
+        }
+    }
+
     @Test
-    void testGetAllCatalogsShouldReturnAllCatalogs() {
-        Mockito.when(catalogRepository.findAll()).thenReturn(Arrays.asList(new Catalog("Test", "Mock", false, "0", Arrays.asList("0")), new Catalog("Test2", "Mock", false, "0", Arrays.asList("0"))));
+    void testGetOfficialCatalogsShouldReturnCatalogList() {
+        Mockito.when(catalogRepository.getOfficialCatalogs()).thenReturn(Arrays.asList(new Catalog("Test", "Mock", false, "0", Arrays.asList("0")), new Catalog("Test2", "Mock", false, "0", Arrays.asList("0"))));
 
         //language=GraphQL
         String document = """
         query  {
-            getAllCatalogs {
-                id
+            getOfficialCatalogs {
                 name
             }
         }
@@ -40,8 +48,8 @@ class CatalogControllerIntTest {
 
         graphQlTester.document(document)
                 .execute()
-                .path("getAllCatalogs")
-                .entityList(Catalog.class)
+                .path("getOfficialCatalogs")
+                .entityList(CatalogMock.class)
                 .hasSize(2);
     }
 }

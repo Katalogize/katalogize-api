@@ -19,13 +19,10 @@ public class RefreshTokenService {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     public RefreshToken createRefreshToken(String userId) {
         RefreshToken refreshToken = new RefreshToken(
                 UUID.randomUUID().toString(),
-                userRepository.findById(userId).get().getId(),
+                userId,
                 Instant.now().plusMillis(refreshTokenDurationMs)
         );
         refreshTokenRepository.deleteByUserId(userId);
