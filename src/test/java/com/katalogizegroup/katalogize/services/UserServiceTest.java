@@ -34,6 +34,9 @@ class UserServiceTest {
     private UploadFileService uploadFileService;
 
     @MockBean
+    private EmailService emailService;
+
+    @MockBean
     private RefreshTokenService refreshTokenService;
 
     User user;
@@ -42,7 +45,10 @@ class UserServiceTest {
     void setUp() {
         when(uploadFileService.uploadFile(anyString(), anyString(), anyString())).thenReturn("File Name");
         when(uploadFileService.deleteFile(anyString())).thenReturn(true);
-        user = new User("Katalogize User","katalogize@email.com", "KatalogizeUser", "KatalogizeUser");
+        doNothing().when(mock(EmailService.class)).sendRegistrationEmail(anyString(), anyString());
+        doNothing().when(mock(EmailService.class)).sendRegistrationEmail("katalogize@gmail.com", anyString());
+        when(emailService.isValidEmailAddress(anyString())).thenReturn(true);
+        user = new User("Katalogize User","katalogize@gmail.com", "KatalogizeUser", "KatalogizeUser");
     }
 
     @Test
@@ -179,6 +185,18 @@ class UserServiceTest {
         );
 
         assertEquals(thrown2.getMessage(), "Email is already in use!");
+
+        when(emailService.isValidEmailAddress(anyString())).thenReturn(false);
+
+        GraphQLException thrown3 = assertThrows(
+                GraphQLException.class,
+                () -> {
+                    userService.signUp(user);
+                },
+                "Expected signUp to throw, but it didn't"
+        );
+
+        assertEquals(thrown3.getMessage(), "Invalid email!");
     }
 
     @Test

@@ -17,6 +17,7 @@ type Mutation {
     signUp(user: UserInput): String
     refreshToken(refreshToken: String): AuthenticationData
     logOut(userId: String): String
+    forgotPassword(email: String!): String
 
     addUserPicture(encodedFile: String): User
     deleteUserPicture: User

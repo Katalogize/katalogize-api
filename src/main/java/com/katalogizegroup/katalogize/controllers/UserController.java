@@ -42,6 +42,11 @@ public class UserController {
     }
 
     @MutationMapping
+    public String forgotPassword(@Argument String email) {
+        return userService.forgotPassword(email);
+    }
+
+    @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
     public User addUserPicture(@Argument String encodedFile) {
         User user = userService.deleteUserPicture(userService.getLoggedUser());

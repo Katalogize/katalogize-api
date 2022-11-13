@@ -18,6 +18,8 @@ type Query {
     getUserById(id: ID!): User
     getUserByUsername(username: String!): User
     getLoggedUser: User
+
+    sendEmail: String
 }
 
 type Catalog {

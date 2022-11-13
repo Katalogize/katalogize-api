@@ -7,6 +7,7 @@ import com.katalogizegroup.katalogize.models.RefreshToken;
 import com.katalogizegroup.katalogize.models.User;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
 import graphql.GraphQLException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +29,9 @@ public class UserService {
 
     @Autowired
     UploadFileService uploadFileService;
+
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     RefreshTokenService refreshTokenService;
@@ -81,6 +85,9 @@ public class UserService {
     }
 
     public String signUp(User user) {
+        if (!emailService.isValidEmailAddress(user.getEmail())) {
+            throw new GraphQLException("Invalid email!");
+        }
         if (userRepository.getUserByEmail(user.getEmail()).isPresent()) {
             throw new GraphQLException("Email is already in use!");
         }
@@ -89,6 +96,8 @@ public class UserService {
         }
         User userObject = new User(user.getDisplayName(), user.getEmail(), user.getUsername(), passwordEncoder.encode(user.getPassword()));
         userRepository.insert(userObject);
+
+        emailService.sendRegistrationEmail(userObject.getEmail(), userObject.getUsername());
 
         return "User registered successfully!";
     }
@@ -102,8 +111,18 @@ public class UserService {
         }
     }
 
+    public String forgotPassword(String email) {
+        User user = getByEmail(email);
+        if (user == null) throw new GraphQLException("Email not registered!");
+        String newPassword = new ObjectId().toString();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        emailService.sendForgotPasswordEmail(email, user.getUsername(), newPassword);
+        return "An email with instructions was sent!";
+    }
+
     public User addUserPicture(User user, String encodedFile) {
-        String pictureLink = uploadFileService.uploadFile(user.getUsername(), "profile", encodedFile);
+        String pictureLink = uploadFileService.uploadFile(user.getId(), "profile", encodedFile);
         user.setPicture(pictureLink);
         return userRepository.save(user);
     }
@@ -120,6 +139,10 @@ public class UserService {
 
     public User getByUsername(String username) {
         return userRepository.getUserByUsername(username).orElse(null);
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.getUserByEmail(email).orElse(null);
     }
 
     public User getById (String id) {
