@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Katalogize API</title>
+	<link rel="icon" href="/images/Logo_K.svg" />
+</head>
+<body style="background-color: #282c34; color: white; font-size: 22px; text-align: center; margin-left: 5%; margin-right: 5%; margin-bottom: 100px; font-family: Inter,sans-serif;">
+    <img src="/images/LogoAPI.svg" style="margin: 40px; width: 350px">
+	<p style="text-align: left">Katalogize API is the backend for Katalogize, a web application to create catalogs about anything you want and however you need with customizable templates.<p>
+	<div style="margin: 35px">
+		<a href="https://katalogize.com" target="_blank" style="padding: 15px; background-color: #27ac9e; color: white; text-decoration: none; border-radius: 10px">Visit Katalogize</a>
+	</div>
+	<h1 style="text-align: left; color: #27ac9e;">Purpose</h1>
+	<p style="text-align: left">The purpose of the public Katalogize API is to enable devs that want to display catalogs data in their aplications in a simple way with GraphQL.<p>
+	<p style="text-align: left">This way, you are able to retrieve the exact data you need from your favorite public catalogs and use it however you would like in your application.</p>
+	<h1 style="text-align: left; color: #27ac9e;">How to use</h1>
+	<p style="text-align: left">We recommend only using the endpoints for retrieving catalog data, since any other endpoint would require authentication and should only be used on Katalogize App.</p>
+	<p style="text-align: left">To retrieve public catalog data, request a POST to the <code style="color: #27ac9e;">https://api.katalogize.com/graphql</code> endpoint with the following GraphQL query:</p>
+	<pre style="
+		text-align: left;
+		background-color: #22262c;
+		border: 1px solid #27ac9e;
+		border-radius: 10px;
+		padding: 15px;
+		width: min-content;
+		font-size: 20px;
+		margin-top: 30px;
+		margin-bottom: px;">
+	<code>
+query {
+  getCatalogByUsernameAndCatalogName(username: "User", catalogName:"Name") {
+    name,
+    description,
+    items {
+      name
+      fields {
+        fieldType: __typename
+        ... on ItemFieldNumber {
+          order,
+          name,
+          numberValue: value
+        }
+        ... on ItemFieldString {
+          order,
+          name,
+          stringValue: value
+        }
+        ... on ItemFieldImage {
+          order,
+          name,
+          imageValue: value {
+            path
+          }
+        }
+      }
+    }
+  }
+}
+	</code>
+	</pre>
+	<p style="text-align: left"> You can also use the exact same properties for queries like: <code>getCatalogsByUsername</code> and <code>getOfficialCatalogs</code>.</p>
+	<p style="text-align: left"><b>Need help?</b> Contact us at: <code style="color: #27ac9e;">katalogize@gmail.com</code></p>
+</body>
+</html>
