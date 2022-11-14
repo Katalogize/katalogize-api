@@ -18,6 +18,9 @@ type Mutation {
     refreshToken(refreshToken: String): AuthenticationData
     logOut(userId: String): String
     forgotPassword(email: String!): String
+    updatePassword(oldPassword: String!, newPassword: String!): User
+    updateUsername(username: String!): User
+    updateDisplayName(displayName: String!): User
 
     addUserPicture(encodedFile: String): User
     deleteUserPicture: User

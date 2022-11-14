@@ -62,6 +62,24 @@ public class UserController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public User updatePassword(@Argument String oldPassword, @Argument String newPassword) {
+        return userService.updatePassword(oldPassword, newPassword);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public User updateUsername(@Argument String username) {
+        return userService.updateUsername(username);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public User updateDisplayNam(@Argument String displayName) {
+        return userService.updateDisplayName(displayName);
+    }
+
+    @MutationMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public User deleteUser(@Argument String id) {
         return userService.deleteById(id);

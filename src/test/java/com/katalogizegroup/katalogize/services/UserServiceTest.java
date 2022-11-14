@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
@@ -26,6 +27,9 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
     @Autowired
     UserService userService;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private UserRepository userRepository;
@@ -46,8 +50,9 @@ class UserServiceTest {
         when(uploadFileService.uploadFile(anyString(), anyString(), anyString())).thenReturn("File Name");
         when(uploadFileService.deleteFile(anyString())).thenReturn(true);
         doNothing().when(mock(EmailService.class)).sendRegistrationEmail(anyString(), anyString());
-        doNothing().when(mock(EmailService.class)).sendRegistrationEmail("katalogize@gmail.com", anyString());
+        doNothing().when(mock(EmailService.class)).sendRegistrationEmail("katalogize@gmail.com", "KatalogizeUser");
         when(emailService.isValidEmailAddress(anyString())).thenReturn(true);
+        when(passwordEncoder.encode(anyString())).thenReturn("password");
         user = new User("Katalogize User","katalogize@gmail.com", "KatalogizeUser", "KatalogizeUser");
     }
 
@@ -93,6 +98,57 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUserInfo() {
+        UserDetails userDetails = UserPrincipal.create(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String newUsername = "New Username";
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.getUserByUsername(newUsername)).thenReturn(Optional.empty());
+        when(userRepository.save(user)).thenReturn(user);
+        User response = userService.updateUsername(newUsername);
+        assertEquals(newUsername, response.getUsername());
+        String newDisplayName = "New DisplayName";
+        response = userService.updateDisplayName(newDisplayName);
+        assertEquals(newDisplayName, response.getDisplayName());
+
+        when(userRepository.getUserByUsername("ExistUser")).thenReturn(Optional.of(user));
+        GraphQLException thrown = assertThrows(
+                GraphQLException.class,
+                () -> {
+                    userService.updateUsername("ExistUser");
+                },
+                "Expected updateUserName to throw, but it didn't"
+        );
+        assertEquals(thrown.getMessage(), "Username already exists!");
+    }
+
+    @Test
+    void updatePassword() {
+        UserDetails userDetails = UserPrincipal.create(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(passwordEncoder.encode(anyString())).thenReturn("newPassword");
+        user.setPassword(passwordEncoder.encode("KatalogizeUser"));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        User response = userService.updatePassword("KatalogizeUser", "newPassword");
+        assertEquals(response.getPassword(), "newPassword");
+
+        when(passwordEncoder.encode(anyString())).thenReturn("wrongPassword");
+        GraphQLException thrown = assertThrows(
+                GraphQLException.class,
+                () -> {
+                    userService.updatePassword("wrongPassword","password");
+                },
+                "Expected updatePassword to throw, but it didn't"
+        );
+        assertEquals(thrown.getMessage(), "Old password does not match.");
+    }
+
+    @Test
     void getLoggedUserThrowsException() {
         GraphQLException thrown = assertThrows(
             GraphQLException.class,
@@ -101,7 +157,7 @@ class UserServiceTest {
             },
             "Expected getLoggedUser to throw, but it didn't"
         );
-        assertEquals(thrown.getMessage(), "Invalid User");
+        assertEquals(thrown.getMessage(), "User not logged in!");
     }
 
     @Test

@@ -50,7 +50,7 @@ public class UserService {
             UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userRepository.findById(userDetails.getId()).orElseThrow();
         } catch (Exception e) {
-            throw new GraphQLException("Invalid User");
+            throw new GraphQLException("User not logged in!");
         }
     }
 
@@ -127,8 +127,31 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User updateUsername(String username) {
+        User user = getLoggedUser();
+        User existUser = getByUsername(username);
+        if(existUser != null) throw new GraphQLException("Username already exists!");
+        user.setUsername(username);
+        return userRepository.save(user);
+    }
+
+    public User updateDisplayName(String displayName) {
+        User user = getLoggedUser();
+        user.setDisplayName(displayName);
+        return userRepository.save(user);
+    }
+
+    public User updatePassword(String oldPassword, String newPassword) {
+        User user = getLoggedUser();
+        if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) throw new GraphQLException("Old password does not match.");
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
     public User deleteUserPicture(User user) {
-        uploadFileService.deleteFile(user.getPicture());
+        if (user.getPicture() != null) {
+            uploadFileService.deleteFile(user.getPicture());
+        }
         user.setPicture(null);
         return userRepository.save(user);
     }
