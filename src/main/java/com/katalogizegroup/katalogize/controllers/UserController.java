@@ -75,7 +75,7 @@ public class UserController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public User updateDisplayNam(@Argument String displayName) {
+    public User updateDisplayName(@Argument String displayName) {
         return userService.updateDisplayName(displayName);
     }
 
