@@ -174,27 +174,12 @@ public class CatalogController {
 
     @QueryMapping
     public Catalog getCatalogByUsernameAndCatalogName(@Argument String username, @Argument String catalogName) {
-        String loggedUsername = "";
-        try {
-            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            loggedUsername = userDetails.getUsername();
-        } finally {
-            Optional<User> user = userRepository.getUserByUsername(username);
-            if (user.isEmpty()) throw new GraphQLException("Invalid user");
-            Catalog catalog = catalogRepository.getCatalogByUserIdAndCatalogName(user.get().getId(), catalogName);
-            if (catalog == null) throw new GraphQLException("Invalid catalog");
-            if ((catalog.isPrivate() && username.equals(loggedUsername)) || !catalog.isPrivate()) {
-                return catalog;
-            }else{
-                throw new GraphQLException("Unauthorized");
-            }
-        }
+        return catalogService.getCatalogByUsernameAndCatalogName(username, catalogName);
     }
 
     @QueryMapping
     @PreAuthorize("hasAuthority('USER')")
     public List<Catalog> getAllCatalogsByLoggedUser() {
-        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return catalogRepository.getCatalogsByUserId(userDetails.getId());
+        return catalogService.getAllCatalogsByLoggedUser();
     }
 }

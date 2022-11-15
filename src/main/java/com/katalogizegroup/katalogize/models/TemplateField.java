@@ -12,5 +12,5 @@ import lombok.Setter;
 public class TemplateField {
     private int order;
     private String name;
-    private int fieldType;
+    private int fieldType; //1: String, 2: Number, 3: Image
 }

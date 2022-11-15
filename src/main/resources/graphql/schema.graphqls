@@ -6,6 +6,7 @@ type Query {
     getAllCatalogsByLoggedUser: [Catalog]
     getCatalogsByUsername(username: String): [Catalog]
     getCatalogByUsernameAndCatalogName(username: String, catalogName: String): Catalog
+    getCatalogPermissions(id: ID): Permission
 
     getAllCatalogItems: [CatalogItem]
     getCatalogItem(username: String, catalogName: String, itemName: String): CatalogItem
@@ -31,6 +32,7 @@ type Catalog {
     isPrivate: Boolean
     isOfficial: Boolean
     items: [CatalogItem]
+    userPermission: Int
 }
 
 type CatalogItem {
@@ -76,6 +78,11 @@ type User {
     username: String
     picture: String
     isAdmin: Boolean
+}
+
+type Permission {
+    email: String
+    permission: Int
 }
 
 type CatalogTemplate {

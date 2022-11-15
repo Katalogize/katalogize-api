@@ -143,7 +143,7 @@ public class UserService {
 
     public User updatePassword(String oldPassword, String newPassword) {
         User user = getLoggedUser();
-        if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) throw new GraphQLException("Old password does not match.");
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) throw new GraphQLException("Old password does not match.");
         user.setPassword(passwordEncoder.encode(newPassword));
         return userRepository.save(user);
     }

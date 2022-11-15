@@ -1,6 +1,8 @@
 type Mutation {
     createCatalog (catalog: CatalogInput): Catalog
     deleteCatalog (id: ID!): Catalog
+    updateCatalogGeneralPermission(permission: Int!): Catalog
+    shareCatalog(email: String!, permission: Int!): Catalog
 
     saveCatalogItem (catalogItem: CatalogItemInput): CatalogItem
     deleteCatalogItem (id: ID): CatalogItem
