@@ -12,7 +12,7 @@ public interface CatalogRepository extends MongoRepository<Catalog, String> {
     @Query("{userId : ?0, name : ?1}")
     Catalog getCatalogByUserIdAndCatalogName(String userId, String name);
 
-    @Query("{userId : ?0, isPrivate: false}")
+    @Query("{userId : ?0, generalPermission: { $gt: 0 }}")
     List<Catalog> getPublicCatalogsByUserId(String userId);
 
     @Query("{isOfficial: true}")

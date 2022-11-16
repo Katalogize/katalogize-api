@@ -155,21 +155,27 @@ public class CatalogController {
         return catalogRepository.getCatalogsByUserId(id);
     }
 
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public Catalog updateCatalogGeneralPermission(@Argument String catalogId, @Argument int permission) {
+        return catalogService.updateCatalogGeneralPermission(catalogId, permission);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public List<Permission> shareCatalog(@Argument String catalogId, @Argument String email, @Argument int permission) {
+        return catalogService.shareCatalog(catalogId, email, permission);
+    }
+
+    @QueryMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public List<Permission> getCatalogPermissions(@Argument String catalogId) {
+        return catalogService.getCatalogPermissions(catalogId);
+    }
+
     @QueryMapping
     public List<Catalog> getCatalogsByUsername(@Argument String username) {
-        String loggedUsername = "";
-        try {
-            UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            loggedUsername = userDetails.getUsername();
-        } finally {
-            Optional<User> user = userRepository.getUserByUsername(username);
-            if (user.isEmpty()) throw new GraphQLException("Invalid user");
-            if (username.equals(loggedUsername)) {
-                return catalogRepository.getCatalogsByUserId(user.get().getId());
-            }else{
-                return catalogRepository.getPublicCatalogsByUserId(user.get().getId());
-            }
-        }
+        return catalogService.getCatalogsByUsername(username);
     }
 
     @QueryMapping
