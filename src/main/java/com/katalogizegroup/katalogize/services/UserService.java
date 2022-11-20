@@ -132,7 +132,9 @@ public class UserService {
         User existUser = getByUsername(username);
         if(existUser != null) throw new GraphQLException("Username already exists!");
         user.setUsername(username);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        emailService.sendChangeUsernameEmail(user.getEmail(), user.getUsername());
+        return user;
     }
 
     public User updateDisplayName(String displayName) {

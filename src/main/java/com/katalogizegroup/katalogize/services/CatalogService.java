@@ -24,6 +24,9 @@ public class CatalogService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    EmailService emailService;
+
     public List<Catalog> getOfficialCatalogs() {
         return catalogRepository.getOfficialCatalogs();
     }
@@ -50,6 +53,7 @@ public class CatalogService {
             permissions.add(new Permission(email, permission));
         }
         catalog.setPermissions(permissions);
+        emailService.sendSharedKatalogEmail(email, catalog.getName());
         return catalogRepository.save(catalog).getPermissions();
     }
 
