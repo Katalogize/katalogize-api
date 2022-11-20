@@ -1,10 +1,7 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.models.*;
-import com.katalogizegroup.katalogize.models.itemfields.ItemField;
-import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
-import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -25,9 +22,6 @@ public class CatalogTemplateController {
 
     @Autowired
     CatalogTemplateRepository catalogTemplateRepository;
-
-    @Autowired
-    SequenceGeneratorService sequenceGenerator;
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")

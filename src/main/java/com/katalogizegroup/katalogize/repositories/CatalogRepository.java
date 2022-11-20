@@ -15,6 +15,9 @@ public interface CatalogRepository extends MongoRepository<Catalog, String> {
     @Query("{userId : ?0, generalPermission: { $gt: 0 }}")
     List<Catalog> getPublicCatalogsByUserId(String userId);
 
+    @Query("{'permissions.email' : ?0}")
+    List<Catalog> getSharedCatalogsByEmail(String email);
+
     @Query("{isOfficial: true}")
     List<Catalog> getOfficialCatalogs();
 }

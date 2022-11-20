@@ -2,8 +2,8 @@ type Query {
     getAllCatalogs: [Catalog]
     getOfficialCatalogs: [Catalog]
     getCatalogById(id: ID): Catalog
-    getAllCatalogsByUserId(id: ID): [Catalog]
     getAllCatalogsByLoggedUser: [Catalog]
+    getSharedCatalogsByLoggedUser: [Catalog]
     getCatalogsByUsername(username: String): [Catalog]
     getCatalogByUsernameAndCatalogName(username: String, catalogName: String): Catalog
     getCatalogPermissions(catalogId: ID): [Permission]
@@ -34,6 +34,7 @@ type Catalog {
     items: [CatalogItem]
     generalPermission: Int
     userPermission: Int
+    isShared: Boolean
 }
 
 type CatalogItem {
@@ -44,6 +45,7 @@ type CatalogItem {
     template: CatalogTemplate
     creationDate: String
     fields: [ItemField]
+    userPermission: Int
 }
 
 union ItemField = ItemFieldNumber | ItemFieldString | ItemFieldImage

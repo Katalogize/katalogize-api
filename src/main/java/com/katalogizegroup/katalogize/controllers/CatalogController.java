@@ -7,9 +7,7 @@ import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
-import com.katalogizegroup.katalogize.repositories.UserRepository;
 import com.katalogizegroup.katalogize.services.CatalogService;
-import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
 import com.katalogizegroup.katalogize.services.UploadFileService;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +40,6 @@ public class CatalogController {
 
     @Autowired
     CatalogTemplateRepository catalogTemplateRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    SequenceGeneratorService sequenceGenerator;
 
     @Autowired
     UploadFileService uploadFileService;
@@ -145,14 +137,9 @@ public class CatalogController {
     }
 
     @QueryMapping
-    public Optional<Catalog> getCatalogById(@Argument String id) {
-        return  catalogRepository.findById(id);
-    }
-
-    @QueryMapping
-    public List<Catalog> getAllCatalogsByUserId(@Argument String id) {
-        //TODO: Return only public catalogs
-        return catalogRepository.getCatalogsByUserId(id);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Catalog getCatalogById(@Argument String id) {
+        return  catalogService.getCatalogById(id);
     }
 
     @MutationMapping
@@ -165,6 +152,12 @@ public class CatalogController {
     @PreAuthorize("hasAuthority('USER')")
     public List<Permission> shareCatalog(@Argument String catalogId, @Argument String email, @Argument int permission) {
         return catalogService.shareCatalog(catalogId, email, permission);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public Boolean leaveCatalog(@Argument String catalogId) {
+        return catalogService.leaveCatalog(catalogId);
     }
 
     @QueryMapping
@@ -187,5 +180,11 @@ public class CatalogController {
     @PreAuthorize("hasAuthority('USER')")
     public List<Catalog> getAllCatalogsByLoggedUser() {
         return catalogService.getAllCatalogsByLoggedUser();
+    }
+
+    @QueryMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public List<Catalog> getSharedCatalogsByLoggedUser() {
+        return catalogService.getSharedCatalogsByLoggedUser();
     }
 }

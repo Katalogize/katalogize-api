@@ -1,6 +1,6 @@
 package com.katalogizegroup.katalogize.controllers;
 
-import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
+
 import com.katalogizegroup.katalogize.models.*;
 import com.katalogizegroup.katalogize.models.itemfields.ItemField;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
@@ -10,8 +10,9 @@ import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogTemplateRepository;
 import com.katalogizegroup.katalogize.repositories.UserRepository;
-import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
+import com.katalogizegroup.katalogize.services.CatalogService;
 import com.katalogizegroup.katalogize.services.UploadFileService;
+import com.katalogizegroup.katalogize.services.UserService;
 import graphql.GraphQLException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,6 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -46,10 +45,13 @@ public class CatalogItemController {
     CatalogTemplateRepository catalogTemplateRepository;
 
     @Autowired
-    SequenceGeneratorService sequenceGenerator;
+    UploadFileService uploadFileService;
 
     @Autowired
-    UploadFileService uploadFileService;
+    CatalogService catalogService;
+
+    @Autowired
+    UserService userService;
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
@@ -61,8 +63,11 @@ public class CatalogItemController {
         if (catalogItemNameExists != null && !catalogItemNameExists.getId().equals(catalogItem.getId())) throw new GraphQLException("An item with this name already exists in this catalog");
         Optional<Catalog> catalog = catalogRepository.findById(catalogItem.getCatalogId());
         Optional<CatalogTemplate> template = catalogTemplateRepository.findById((catalogItem.getTemplateId()));
+        User loggedUser = userService.getLoggedUser();
         //Map fields by template
         if (!catalog.isEmpty() && !template.isEmpty() && catalog.get().getTemplateIds().contains(catalogItem.getTemplateId())) {
+            int userPermission = catalog.get().setUserPermission(loggedUser);
+            if (userPermission <= 1) throw new GraphQLException("Unauthorized");
             CatalogItem createdCatalogItem = new CatalogItem(catalogItem.getCatalogId(), catalogItem.getTemplateId(), catalogItem.getName(), new ArrayList<>());
             if (!catalogItemExists.isEmpty()) {
                 createdCatalogItem.setId(catalogItemExists.get().getId());
@@ -159,6 +164,7 @@ public class CatalogItemController {
 
             //Create and save catalog
             CatalogItem catalogItemEntity = catalogItemRepository.save(createdCatalogItem);
+            catalogItemEntity.setUserPermission(catalog.get().getUserPermission());
             return catalogItemEntity;
         } else {
             throw new GraphQLException("Catalog or Template does not exist or are not associated");
@@ -169,28 +175,28 @@ public class CatalogItemController {
     @PreAuthorize("hasAuthority('USER')")
     public CatalogItem deleteCatalogItem(@Argument String id) {
         Optional<CatalogItem> catalogItemEntity = catalogItemRepository.findById(id);
-        boolean isAdmin = false;
-        String userId = "";
+        User loggedUser;
         if (!catalogItemEntity.isEmpty()) {
             //Check if user is allowed to delete
-            Optional<Catalog> catalogEntity = catalogRepository.findById(catalogItemEntity.get().getCatalogId());
+            Catalog catalogEntity = catalogService.getCatalogById(catalogItemEntity.get().getCatalogId());
+//            Optional<Catalog> catalogEntity = catalogRepository.findById(catalogItemEntity.get().getCatalogId());
             try {
-                UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                isAdmin = userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"));
-                userId = userDetails.getId();
-            } finally {
-                if ((catalogEntity.get().getUserId().equals(userId)) || isAdmin) {
-                    List<ItemField> imagesField = catalogItemEntity.get().getFields().stream().filter(field -> field.getClass() == ItemFieldImage.class).collect(Collectors.toList());
-                    for (ItemField field: imagesField) {
-                        for (UploadFile image : ((ItemFieldImage) field).getValue()) {
-                            uploadFileService.deleteFile(image.getPath());
-                        }
+                loggedUser = userService.getLoggedUser();
+            } catch (Exception e) {
+                loggedUser = null;
+            }
+            catalogEntity.setUserPermission(loggedUser);
+            if (catalogEntity.getUserPermission() >= 2) {
+                List<ItemField> imagesField = catalogItemEntity.get().getFields().stream().filter(field -> field.getClass() == ItemFieldImage.class).collect(Collectors.toList());
+                for (ItemField field: imagesField) {
+                    for (UploadFile image : ((ItemFieldImage) field).getValue()) {
+                        uploadFileService.deleteFile(image.getPath());
                     }
-                    catalogItemRepository.deleteById(id);
-                    return catalogItemEntity.get();
-                } else {
-                    throw new GraphQLException("Unauthorized");
                 }
+                catalogItemRepository.deleteById(id);
+                return catalogItemEntity.get();
+            } else {
+                throw new GraphQLException("Unauthorized");
             }
         }
         return null;
@@ -203,12 +209,21 @@ public class CatalogItemController {
 
     @QueryMapping
     public CatalogItem getCatalogItem(@Argument String username, @Argument String catalogName, @Argument String itemName) {
+        User loggedUser;
+        try {
+            loggedUser = userService.getLoggedUser();
+        } catch (Exception e) {
+            loggedUser = null;
+        }
         Optional<User> user = userRepository.getUserByUsername(username);
         if (user.isEmpty()) throw new GraphQLException("Invalid user");
         Catalog catalog = catalogRepository.getCatalogByUserIdAndCatalogName(user.get().getId(), catalogName);
         if (catalog == null) throw new GraphQLException("Invalid catalog");
+        catalog.setUserPermission(loggedUser);
+        if (catalog.getUserPermission() == 0) throw new GraphQLException("Unauthorized");
         CatalogItem catalogItem = catalogItemRepository.getCatalogItemByNameAndCatalogId(itemName, catalog.getId());
         if (catalogItem == null) throw new GraphQLException("Invalid item");
+        catalogItem.setUserPermission(catalog.getUserPermission());
         return catalogItem;
     }
 

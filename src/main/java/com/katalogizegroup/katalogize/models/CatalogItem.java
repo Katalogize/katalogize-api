@@ -25,8 +25,7 @@ public class CatalogItem {
 
     @NonNull private Instant creationDate = Instant.now();
 
-//    @Transient
-//    public static final String SEQUENCE_NAME = "catalog_items_sequence";
+    @Transient @Getter @Setter private int userPermission;
 
     public void addField (ItemField field) {
         fields.add(field);

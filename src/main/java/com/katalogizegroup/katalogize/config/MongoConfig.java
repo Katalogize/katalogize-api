@@ -5,8 +5,6 @@ import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldString;
 import com.katalogizegroup.katalogize.repositories.*;
-import com.katalogizegroup.katalogize.services.SequenceGeneratorService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -23,14 +21,10 @@ import java.util.List;
 @Profile({"default"})
 public class MongoConfig {
     @Autowired
-    SequenceGeneratorService sequenceGenerator;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner commandLineRunner(CatalogRepository catalogRepository, CatalogItemRepository catalogItemRepository, UserRepository userRepository, CatalogTemplateRepository templateRepository, RefreshTokenRepository refreshTokenRepository) {
-//        (int)sequenceGenerator.generateSequence(User.SEQUENCE_NAME);
         if (catalogRepository.findAll().size() == 0 && userRepository.findAll().size() == 0) {
             return strings -> {
                 List<User> users = Arrays.asList(
@@ -49,10 +43,10 @@ public class MongoConfig {
                 );
 
                 List<Catalog> catalogs = Arrays.asList(
-                        new Catalog("Games", "Video game recommendations from the Katalogize Team", false, users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
-                        new Catalog("Movies", "Movies recommendations from the Katalogize Team", false, users.get(0).getId(), Arrays.asList(templates.get(2).getId())),
-                        new Catalog("Series", "Series recommendations from the Katalogize Team", false, users.get(0).getId(), Arrays.asList(templates.get(3).getId())),
-                        new Catalog("Books", "Best-Seller books recommendations from the Katalogize Team", false, users.get(0).getId(), Arrays.asList(templates.get(4).getId()))
+                        new Catalog("Games", "Video game recommendations from the Katalogize Team", users.get(0).getId(), Arrays.asList(templates.get(1).getId())),
+                        new Catalog("Movies", "Movies recommendations from the Katalogize Team", users.get(0).getId(), Arrays.asList(templates.get(2).getId())),
+                        new Catalog("Series", "Series recommendations from the Katalogize Team", users.get(0).getId(), Arrays.asList(templates.get(3).getId())),
+                        new Catalog("Books", "Best-Seller books recommendations from the Katalogize Team", users.get(0).getId(), Arrays.asList(templates.get(4).getId()))
                 );
                 catalogs.get(0).setOfficial(true);
                 catalogs.get(1).setOfficial(true);

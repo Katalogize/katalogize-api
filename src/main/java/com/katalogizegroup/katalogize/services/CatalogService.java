@@ -57,6 +57,17 @@ public class CatalogService {
         return catalogRepository.save(catalog).getPermissions();
     }
 
+    public Boolean leaveCatalog(String catalogId) {
+        Catalog catalog = getCatalogById(catalogId);
+        if (catalog == null) throw new GraphQLException("Invalid catalog");
+        User user = userService.getLoggedUser();
+        List<Permission> permissions = catalog.getPermissions();
+        permissions.removeIf(p -> p.getEmail().equals(user.getEmail()));
+        catalog.setPermissions(permissions);
+        catalogRepository.save(catalog);
+        return true;
+    }
+
     public List<Permission> getCatalogPermissions(String catalogId) {
         User user = userService.getLoggedUser();
         Catalog catalog = getCatalogById(catalogId);
@@ -91,25 +102,12 @@ public class CatalogService {
         if (owner == null) throw new GraphQLException("Invalid user");
         Catalog catalog = getCatalogByUserIdAndCatalogName(owner.getId(), catalogName);
         if (catalog == null) throw new GraphQLException("Invalid catalog");
-        int userPermission = getUserCatalogPermission(user, catalog);
-        if (userPermission > 0){
-            catalog.setUserPermission(userPermission);
+        catalog.setUserPermission(user);
+        if (catalog.getUserPermission() > 0){
             return catalog;
         }else{
             throw new GraphQLException("Unauthorized");
         }
-    }
-
-    public int getUserCatalogPermission (User user, Catalog catalog) {
-        if (user == null) {
-            if (catalog.getGeneralPermission() >= 2) return 1; //Only allow edition for authenticated users
-            return catalog.getGeneralPermission();
-        }
-        if (user.getId().equals(catalog.getUserId()))return 3;
-        if (catalog.getGeneralPermission() == 2) return 2; //Owner or public edit
-        Permission userPermission = catalog.getPermissions().stream().filter(permission-> permission.getEmail().equals(user.getEmail())).findFirst().orElse(null);
-        if (userPermission == null) return catalog.getGeneralPermission();
-        return userPermission.getPermission();
     }
 
     public Catalog getCatalogByUserIdAndCatalogName (String userId, String catalogName) {
@@ -123,5 +121,10 @@ public class CatalogService {
     public List<Catalog> getAllCatalogsByLoggedUser() {
         User user = userService.getLoggedUser();
         return catalogRepository.getCatalogsByUserId(user.getId());
+    }
+
+    public List<Catalog> getSharedCatalogsByLoggedUser() {
+        User user = userService.getLoggedUser();
+        return catalogRepository.getSharedCatalogsByEmail(user.getEmail());
     }
 }

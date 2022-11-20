@@ -3,6 +3,7 @@ type Mutation {
     deleteCatalog (id: ID!): Catalog
     updateCatalogGeneralPermission(catalogId: ID!, permission: Int!): Catalog
     shareCatalog(catalogId: ID!, email: String!, permission: Int!): [Permission]
+    leaveCatalog(catalogId: ID!): Boolean
 
     saveCatalogItem (catalogItem: CatalogItemInput): CatalogItem
     deleteCatalogItem (id: ID): CatalogItem
