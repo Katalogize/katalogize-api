@@ -3,12 +3,10 @@ package com.katalogizegroup.katalogize.models;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.Date;
 
 @Data
 @Document(collection = "users")
@@ -36,6 +34,4 @@ public class User {
 
     @NonNull private Instant creationDate = Instant.now();
 
-//    @Transient
-//    public static final String SEQUENCE_NAME = "users_sequence";
 }

@@ -2,8 +2,6 @@ package com.katalogizegroup.katalogize.models;
 
 import lombok.*;
 
-import java.util.List;
-
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Getter
@@ -16,5 +14,4 @@ public class JwtResponse {
     @NonNull private String username;
     @NonNull private String email;
     @NonNull private boolean isAdmin;
-//    private List<String> roles;
 }
