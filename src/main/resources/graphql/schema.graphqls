@@ -29,7 +29,6 @@ type Catalog {
     description: String
     user: User
     templates: [CatalogTemplate]
-    isPrivate: Boolean
     isOfficial: Boolean
     items: [CatalogItem]
     generalPermission: Int
@@ -44,6 +43,7 @@ type CatalogItem {
     templateId: ID
     template: CatalogTemplate
     creationDate: String
+    modifiedDate: String
     fields: [ItemField]
     userPermission: Int
 }

@@ -20,7 +20,8 @@ public class Catalog {
     @NonNull private boolean isOfficial = false;
     @NonNull private String userId;
     @NonNull private List<String> templateIds;
-    @NonNull private Instant creationDate = Instant.now();
+    @NonNull private Instant modifiedDate = Instant.now();
+    @Getter @Setter private Instant creationDate;
     @Getter @Setter private int generalPermission = 1; //0: No Access, 1: View, 2: Edit, 3: Owner
     @Getter @Setter private List<Permission> permissions = new ArrayList<>();
     @Transient @Getter @Setter private int userPermission;

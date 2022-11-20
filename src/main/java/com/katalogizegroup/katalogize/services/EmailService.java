@@ -16,7 +16,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    private String registerMailHtml = """
+    private final String registerMailHtml = """
             <div style='display: flex; place-content: center;'>
                 <div style='width: max-content; margin: 50px; padding: 50px; border-radius: 10px; box-shadow: 0 1px 10px 0 rgb(0 0 0 / 10%), 0 2px 15px 0 rgb(0 0 0 / 5%);'>
                     <div>
@@ -37,7 +37,7 @@ public class EmailService {
             </div>
             """;
 
-    private String sharedKatalogHtml = """
+    private final String sharedKatalogHtml = """
             <div style='display: flex; place-content: center;'>
                 <div style='width: max-content; margin: 50px; padding: 50px; border-radius: 10px; box-shadow: 0 1px 10px 0 rgb(0 0 0 / 10%), 0 2px 15px 0 rgb(0 0 0 / 5%);'>
                     <div>
@@ -56,7 +56,7 @@ public class EmailService {
             </div>
             """;
 
-    private String changeUsernameHtml = """
+    private final String changeUsernameHtml = """
             <div style='display: flex; place-content: center;'>
                 <div style='width: max-content; margin: 50px; padding: 50px; border-radius: 10px; box-shadow: 0 1px 10px 0 rgb(0 0 0 / 10%), 0 2px 15px 0 rgb(0 0 0 / 5%);'>
                     <div>
@@ -75,7 +75,7 @@ public class EmailService {
             </div>
             """;
 
-    private String changePasswordHtml = """
+    private final String changePasswordHtml = """
             <div style='display: flex; place-content: center;'>
                 <div style='width: max-content; margin: 50px; padding: 50px; border-radius: 10px; box-shadow: 0 1px 10px 0 rgb(0 0 0 / 10%), 0 2px 15px 0 rgb(0 0 0 / 5%);'>
                     <div>
@@ -114,13 +114,13 @@ public class EmailService {
     }
 
     public void sendSharedKatalogEmail (String emailTo, String catalogName) {
-        String message = registerMailHtml.replace("KATALOG_NAME", catalogName);
+        String message = sharedKatalogHtml.replace("KATALOG_NAME", catalogName);
         String subject = "Katalogize - A Katalog was shared with you";
         sendEmail(emailTo, subject, message);
     }
 
     public void sendChangeUsernameEmail (String emailTo, String userName) {
-        String message = registerMailHtml.replace("USER_NAME", userName);
+        String message = changeUsernameHtml.replace("USER_NAME", userName);
         String subject = "Katalogize - Username change requested";
         sendEmail(emailTo, subject, message);
     }

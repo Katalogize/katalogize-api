@@ -1,19 +1,17 @@
 package com.katalogizegroup.katalogize.services;
 
-import com.katalogizegroup.katalogize.config.security.user.UserPrincipal;
-import com.katalogizegroup.katalogize.models.Catalog;
-import com.katalogizegroup.katalogize.models.Permission;
-import com.katalogizegroup.katalogize.models.User;
+import com.katalogizegroup.katalogize.models.*;
+import com.katalogizegroup.katalogize.models.itemfields.ItemField;
+import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
+import com.katalogizegroup.katalogize.repositories.CatalogItemRepository;
 import com.katalogizegroup.katalogize.repositories.CatalogRepository;
 import graphql.GraphQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CatalogService {
@@ -26,6 +24,56 @@ public class CatalogService {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    UploadFileService uploadFileService;
+
+    @Autowired
+    CatalogItemRepository catalogItemRepository;
+
+    @Autowired
+    CatalogTemplateService catalogTemplateService;
+
+    public Catalog createCatalog(Catalog catalog) {
+        User loggedUser = userService.getLoggedUser();
+        catalog.setUserId(loggedUser.getId());
+        Catalog catalogExists = catalogRepository.getCatalogByUserIdAndCatalogName(loggedUser.getId(), catalog.getName());
+        if (catalogExists != null) throw new GraphQLException("Catalog with this name already exists in this account");
+        if (catalogTemplateService.getTemplateById(catalog.getTemplateIds().get(0)) == null) throw new GraphQLException("Invalid template");
+        catalog.setCreationDate(Instant.now());
+        return catalogRepository.insert(catalog);
+    }
+
+    public Catalog saveCatalogAndTemplate(Catalog catalog, CatalogTemplate catalogTemplate) {
+        if (catalog.getName().equals("")) throw new GraphQLException("Invalid Catalog name");
+        User loggedUser = userService.getLoggedUser();
+        catalog.setUserId(loggedUser.getId());
+        Catalog catalogExists = catalogRepository.getCatalogByUserIdAndCatalogName(loggedUser.getId(), catalog.getName());
+        if (catalogExists != null) throw new GraphQLException("Catalog with this name already exists in this account");
+        CatalogTemplate catalogTemplateEntity = catalogTemplateService.createCatalogTemplate(catalogTemplate);
+        catalog.setTemplateIds(Collections.singletonList(catalogTemplateEntity.getId()));
+        catalog.setCreationDate(Instant.now());
+        return catalogRepository.insert(catalog);
+    }
+
+    public Catalog deleteCatalog(String id) {
+        Catalog catalog = getCatalogById(id);
+        if (catalog == null) throw new GraphQLException("Invalid Catalog");
+        User loggedUser = userService.getLoggedUser();
+        if (!(catalog.getUserId().equals(loggedUser.getId()) || loggedUser.isAdmin())) throw new GraphQLException("Unauthorized");
+        List<CatalogItem> deletedItems = catalogItemRepository.deleteAllByCatalogId(catalog.getId());
+        for (CatalogItem item : deletedItems) {
+            List<ItemField> imagesField = item.getFields().stream().filter(field -> field.getClass() == ItemFieldImage.class).toList();
+            for (ItemField field: imagesField) {
+                for (UploadFile image : ((ItemFieldImage) field).getValue()) {
+                    uploadFileService.deleteFile(image.getPath());
+                }
+            }
+        }
+        catalogTemplateService.deleteTemplateById(catalog.getTemplateIds().get(0));
+        catalogRepository.deleteById(id);
+        return catalog;
+    }
 
     public List<Catalog> getOfficialCatalogs() {
         return catalogRepository.getOfficialCatalogs();
@@ -75,7 +123,7 @@ public class CatalogService {
         return catalog.getPermissions();
     }
 
-    public List<Catalog> getCatalogsByUsername(@Argument String username) {
+    public List<Catalog> getCatalogsByUsername(String username) {
         User user;
         try {
             user = userService.getLoggedUser();
@@ -121,6 +169,10 @@ public class CatalogService {
     public List<Catalog> getAllCatalogsByLoggedUser() {
         User user = userService.getLoggedUser();
         return catalogRepository.getCatalogsByUserId(user.getId());
+    }
+
+    public List<Catalog> getAllCatalogs() {
+        return catalogRepository.findAll();
     }
 
     public List<Catalog> getSharedCatalogsByLoggedUser() {

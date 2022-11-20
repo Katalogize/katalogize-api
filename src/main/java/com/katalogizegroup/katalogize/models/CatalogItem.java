@@ -23,7 +23,9 @@ public class CatalogItem {
     @NonNull private String name;
     @NonNull private List<ItemField> fields;
 
-    @NonNull private Instant creationDate = Instant.now();
+    @NonNull private Instant modifiedDate = Instant.now();
+
+    @Getter @Setter private Instant creationDate;
 
     @Transient @Getter @Setter private int userPermission;
 

@@ -20,6 +20,8 @@ public class CatalogTemplate {
 
     @NonNull private boolean allowNewFields;
 
-    @NonNull private Instant creationDate = Instant.now();
+    @NonNull private Instant modifiedDate = Instant.now();
+
+    @Getter @Setter private Instant creationDate;
 
 }
