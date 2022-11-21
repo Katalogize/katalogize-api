@@ -1,12 +1,13 @@
 package com.katalogizegroup.katalogize.models.itemfields;
 
 import lombok.*;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@Data
 public abstract class ItemField {
-    @NonNull private int order;
-    @NonNull private String name = "Field Name";
+    @NonNull private String templateFieldId;
+    @NonNull private String name;
 }
 

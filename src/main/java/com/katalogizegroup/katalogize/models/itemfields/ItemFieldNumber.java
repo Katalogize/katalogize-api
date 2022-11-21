@@ -9,8 +9,8 @@ public class ItemFieldNumber extends ItemField {
 
     public double value;
 
-    public ItemFieldNumber(int order, String name, double value) {
-        super(order, name);
+    public ItemFieldNumber(String templateFieldId, String name, double value) {
+        super(templateFieldId, name);
         this.value = value;
     }
 }

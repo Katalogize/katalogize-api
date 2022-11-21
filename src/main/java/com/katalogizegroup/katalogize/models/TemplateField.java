@@ -1,16 +1,16 @@
 package com.katalogizegroup.katalogize.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class TemplateField {
-    private int order;
-    private String name;
-    private int fieldType; //1: String, 2: Number, 3: Image
+    @Id
+    private String id = new ObjectId().toString();
+    @NonNull private int order;
+    @NonNull private String name;
+    @NonNull private int fieldType; //1: String, 2: Number, 3: Image
 }

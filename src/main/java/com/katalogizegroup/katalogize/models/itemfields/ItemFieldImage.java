@@ -12,8 +12,8 @@ public class ItemFieldImage extends ItemField {
 
     public List<UploadFile> value;
 
-    public ItemFieldImage(int order, String name, List<UploadFile> value) {
-        super(order, name);
+    public ItemFieldImage(String templateFieldId, String name, List<UploadFile> value) {
+        super(templateFieldId, name);
         this.value = value;
     }
 }

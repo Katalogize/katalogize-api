@@ -77,7 +77,7 @@ public class CatalogItemController {
                 switch (templateField.getFieldType()){
                     case 1:
                         Optional<ItemFieldString> itemString;
-                        itemString = catalogItem.getStringFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        itemString = catalogItem.getStringFields().stream().filter(field -> field.getTemplateFieldId().equals(templateField.getId())).findFirst();
                         if (!itemString.isEmpty()) { //Exists in template
                             createdCatalogItem.addField(itemString.get());
                             catalogItem.getStringFields().remove(itemString.get());
@@ -87,7 +87,7 @@ public class CatalogItemController {
                         break;
                     case 2:
                         Optional<ItemFieldNumber> itemInt;
-                        itemInt = catalogItem.getNumberFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        itemInt = catalogItem.getNumberFields().stream().filter(field -> field.getTemplateFieldId().equals(templateField.getId())).findFirst();
                         if (!itemInt.isEmpty()) {
                             createdCatalogItem.addField(itemInt.get());
                             catalogItem.getNumberFields().remove(itemInt.get());
@@ -97,10 +97,10 @@ public class CatalogItemController {
                         break;
                     case 3:
                         Optional<ItemFieldImage> itemImage;
-                        itemImage = catalogItem.getImageFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                        itemImage = catalogItem.getImageFields().stream().filter(field -> field.getTemplateFieldId().equals(templateField.getId())).findFirst();
                         List<UploadFile> existentImages = new ArrayList<>(); //Get existent images for this field
                         if (!catalogItemExists.isEmpty()) {
-                            Optional<ItemField> existentFields = catalogItemExists.get().getFields().stream().filter(field -> field.getOrder() == templateField.getOrder()).findFirst();
+                            Optional<ItemField> existentFields = catalogItemExists.get().getFields().stream().filter(field -> field.getTemplateFieldId().equals(templateField.getId())).findFirst();
                             if (!existentFields.isEmpty()) existentImages = ((ItemFieldImage) existentFields.get()).getValue();
                         }
                         if (!itemImage.isEmpty()) { //Add images and upload the ones that have data
@@ -139,7 +139,7 @@ public class CatalogItemController {
                 if (template.get().isAllowNewFields()) {
                     while (!catalogItem.getNumberFields().isEmpty() || !catalogItem.getStringFields().isEmpty()) {
                         if (!catalogItem.getNumberFields().isEmpty()) {
-                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getOrder() == catalogItem.getNumberFields().get(0).getOrder()).findFirst();
+                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getTemplateFieldId().equals(catalogItem.getNumberFields().get(0).getTemplateFieldId())).findFirst();
                             if (existentItemOrder.isEmpty()) {
                                 createdCatalogItem.addField(catalogItem.getNumberFields().get(0));
                                 catalogItem.getNumberFields().remove(catalogItem.getNumberFields().get(0));
@@ -148,7 +148,7 @@ public class CatalogItemController {
                             }
                         }
                         if (!catalogItem.getStringFields().isEmpty()) {
-                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getOrder() == catalogItem.getStringFields().get(0).getOrder()).findFirst();
+                            Optional<ItemField> existentItemOrder = createdCatalogItem.getFields().stream().filter(field -> field.getTemplateFieldId().equals(catalogItem.getStringFields().get(0).getTemplateFieldId())).findFirst();
                             if (existentItemOrder.isEmpty()) {
                                 createdCatalogItem.addField(catalogItem.getStringFields().get(0));
                                 catalogItem.getStringFields().remove(catalogItem.getStringFields().get(0));
@@ -250,8 +250,8 @@ public class CatalogItemController {
         if (!template.isEmpty()) {
             CatalogTemplate templateEntity = template.get();
             for (ItemField item : itemFields) {
-                if (item.getOrder() != -1) {
-                    Optional<TemplateField> templateField = templateEntity.getTemplateFields().stream().filter(field -> field.getOrder() == item.getOrder()).findFirst();
+                if (item.getTemplateFieldId() != null) {
+                    Optional<TemplateField> templateField = templateEntity.getTemplateFields().stream().filter(field -> field.getId().equals(item.getTemplateFieldId())).findFirst();
                     if (!templateField.isEmpty()) {
                         item.setName(templateField.get().getName());
                     }

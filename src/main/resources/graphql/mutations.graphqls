@@ -30,6 +30,7 @@ type Mutation {
 }
 
 input CatalogInput {
+    id: String!
     name: String!
     description: String!
     userId: ID!
@@ -47,21 +48,21 @@ input CatalogItemInput {
 }
 
 input ItemFieldNumberInput {
-    order: Int
+    templateFieldId: ID!
     name: String!
-    value: Float
+    value: Float!
 }
 
 input ItemFieldStringInput {
-    order: Int
+    templateFieldId: ID!
     name: String!
-    value: String
+    value: String!
 }
 
 input ItemFieldImageInput {
-    order: Int
+    templateFieldId: ID!
     name: String!
-    value: [UploadFileInput]
+    value: [UploadFileInput]!
 }
 
 input UploadFileInput {
@@ -70,15 +71,17 @@ input UploadFileInput {
 }
 
 input CatalogTemplateInput {
+    id: String!
     name: String!
     allowNewFields: Boolean!
     templateFields: [TemplateFieldInput]
 }
 
 input TemplateFieldInput {
-    order: Int
-    name: String
-    fieldType: Int
+    id: String!
+    order: Int!
+    name: String!
+    fieldType: Int!
 }
 
 input UserInput {

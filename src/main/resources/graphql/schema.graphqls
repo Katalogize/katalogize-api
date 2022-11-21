@@ -51,19 +51,19 @@ type CatalogItem {
 union ItemField = ItemFieldNumber | ItemFieldString | ItemFieldImage
 
 type ItemFieldNumber {
-    order: Int
+    templateFieldId: ID
     name: String!
     value: Float
 }
 
 type ItemFieldString {
-    order: Int
+    templateFieldId: ID
     name: String!
     value: String
 }
 
 type ItemFieldImage {
-    order: Int
+    templateFieldId: ID
     name: String!
     value: [UploadFile]
 }
@@ -96,6 +96,7 @@ type CatalogTemplate {
 }
 
 type TemplateField {
+    id: ID
     order: Int
     name: String
     fieldType: Int

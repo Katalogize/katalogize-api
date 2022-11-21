@@ -9,8 +9,8 @@ public class ItemFieldString extends ItemField {
 
     public String value;
 
-    public ItemFieldString(int order, String name, String value) {
-        super(order, name);
+    public ItemFieldString(String templateFieldId, String name, String value) {
+        super(templateFieldId, name);
         this.value = value;
     }
 }
