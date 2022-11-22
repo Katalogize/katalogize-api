@@ -1,6 +1,9 @@
 package com.katalogizegroup.katalogize.controllers;
 
 import com.katalogizegroup.katalogize.models.*;
+import com.katalogizegroup.katalogize.models.inputs.CatalogInput;
+import com.katalogizegroup.katalogize.models.inputs.CatalogTemplateInput;
+import com.katalogizegroup.katalogize.models.inputs.TemplateFieldInput;
 import com.katalogizegroup.katalogize.services.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -10,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,8 +31,18 @@ public class CatalogController {
 
     @MutationMapping
     @PreAuthorize("hasAuthority('USER')")
-    public Catalog saveCatalogAndTemplate(@Argument Catalog catalog, @Argument CatalogTemplate catalogTemplate) {
-        return catalogService.saveCatalogAndTemplate(catalog, catalogTemplate);
+    public Catalog saveCatalogAndTemplate(@Argument CatalogInput catalog, @Argument CatalogTemplateInput catalogTemplate) {
+        Catalog catalogToCreate = new Catalog(catalog.getName(), catalog.getDescription(), catalog.getUserId(), catalog.getTemplateIds());
+        catalogToCreate.setId(catalog.getId());
+        List<TemplateField> fields = new ArrayList<>();
+        for (TemplateFieldInput field: catalogTemplate.getTemplateFields()) {
+            TemplateField newField = new TemplateField(field.getOrder(), field.getName(), field.getFieldType());
+            newField.setId(field.getId());
+            fields.add(newField);
+        }
+        CatalogTemplate catalogTemplateToCreate = new CatalogTemplate(catalogTemplate.getName(), fields, catalogTemplate.isAllowNewFields());
+        catalogTemplateToCreate.setId(catalogTemplate.getId());
+        return catalogService.saveCatalogAndTemplate(catalogToCreate, catalogTemplateToCreate);
     }
 
     @MutationMapping

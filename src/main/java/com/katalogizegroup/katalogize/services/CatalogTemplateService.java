@@ -20,6 +20,10 @@ public class CatalogTemplateService
         return catalogTemplateRepository.insert(catalogTemplate);
     }
 
+    public CatalogTemplate saveCatalogTemplate(CatalogTemplate catalogTemplate) {
+        return catalogTemplateRepository.save(catalogTemplate);
+    }
+
     public CatalogTemplate deleteTemplateById(String id) {
         CatalogTemplate templateEntity = getTemplateById(id);
         if (templateEntity != null) {

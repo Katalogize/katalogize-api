@@ -1,4 +1,4 @@
-package com.katalogizegroup.katalogize.models;
+package com.katalogizegroup.katalogize.models.inputs;
 
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldImage;
 import com.katalogizegroup.katalogize.models.itemfields.ItemFieldNumber;

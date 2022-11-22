@@ -12,7 +12,7 @@ import java.util.List;
 @Document (collection = "catalog-templates")
 public class CatalogTemplate {
     @Id
-    private String id = new ObjectId().toString();;
+    private String id = new ObjectId().toString();
 
     @NonNull private String name;
 
