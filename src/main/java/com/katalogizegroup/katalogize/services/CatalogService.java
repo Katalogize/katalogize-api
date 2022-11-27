@@ -192,17 +192,17 @@ public class CatalogService {
     }
 
     public Catalog getCatalogByUsernameAndCatalogName(String username, String catalogName) {
-        User user;
+        User loggedUser;
         try {
-            user = userService.getLoggedUser();
+            loggedUser = userService.getLoggedUser();
         } catch (Exception e) {
-            user = null;
+            loggedUser = null;
         }
         User owner = userService.getByUsername(username);
         if (owner == null) throw new GraphQLException("Invalid user");
         Catalog catalog = getCatalogByUserIdAndCatalogName(owner.getId(), catalogName);
         if (catalog == null) throw new GraphQLException("Invalid catalog");
-        catalog.setUserPermission(user);
+        catalog.setUserPermission(loggedUser);
         if (catalog.getUserPermission() > 0){
             return catalog;
         }else{
