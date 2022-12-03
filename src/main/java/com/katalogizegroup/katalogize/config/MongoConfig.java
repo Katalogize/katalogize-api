@@ -28,8 +28,7 @@ public class MongoConfig {
         if (catalogRepository.findAll().size() == 0 && userRepository.findAll().size() == 0) {
             return strings -> {
                 List<User> users = Arrays.asList(
-                        new User("Katalogize Team", "katalogize@gmail.com", "KatalogizeAdmin", passwordEncoder.encode("K4t4l0g1z3Adm1n321")),
-                        new User("Katalogize User","katalogize2@email.com", "KatalogizeUser", passwordEncoder.encode("KatalogizeUser"))
+                        new User("Katalogize Team", "katalogize@gmail.com", "KatalogizeAdmin", passwordEncoder.encode("AdminPassword"))
                 );
 
                 users.get(0).setAdmin(true);

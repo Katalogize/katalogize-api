@@ -26,6 +26,13 @@ spec:
         - name: katalogize-api
           image: us.gcr.io/katalogize/spring-katalogize:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "300Mi"
+              cpu: "50m"
+            limits:
+              memory: "600Mi"
+              cpu: "100m"
           readinessProbe:
             httpGet:
               port: 8080

@@ -7,7 +7,12 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
+      memory: "100Mi"
+      cpu: "32m"
       storage: 1Gi
+    limits:
+      memory: "200Mi"
+      cpu: "64m"
 ---
 apiVersion: v1
 kind: Service
@@ -36,6 +41,13 @@ spec:
       containers:
         - name: mongo-db
           image: mongo
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "32m"
+            limits:
+              memory: "200Mi"
+              cpu: "64m"
           ports:
             - containerPort: 27017
           volumeMounts:
